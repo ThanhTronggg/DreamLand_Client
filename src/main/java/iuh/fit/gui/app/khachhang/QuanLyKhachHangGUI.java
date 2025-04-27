@@ -2,14 +2,19 @@ package iuh.fit.gui.app.khachhang;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
-import dao.KhachHangDAO;
 import entity.KhachHang;
 import net.miginfocom.swing.MigLayout;
+import service.KhachHangService;
+import service.SanPhamService;
 
 public class QuanLyKhachHangGUI extends JPanel {
 
@@ -19,11 +24,11 @@ public class QuanLyKhachHangGUI extends JPanel {
     private JButton btnSua, btnXoa;
     private DefaultTableModel tableModel;
     private JTable table;
-    private KhachHangDAO khachHangDAO;
+    private KhachHangService khachHangDAO;
     private Timer searchTimer;
 
-    public QuanLyKhachHangGUI() {
-        khachHangDAO = new KhachHangDAO(KhachHang.class);
+    public QuanLyKhachHangGUI() throws MalformedURLException, NotBoundException, RemoteException {
+        khachHangDAO = (KhachHangService) Naming.lookup("rmi://XXXXXX:9090/khachHangService");
         setLayout(new BorderLayout());
         initComponents();
        // loadInitialData();

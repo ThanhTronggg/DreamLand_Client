@@ -6,6 +6,10 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -23,12 +27,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FilenameUtils;
 
-import dao.SanPhamDAO;
 import entity.SanPham;
 import net.miginfocom.swing.MigLayout;
 import raven.crazypanel.CrazyPanel;
 import raven.toast.Notifications;
 import raven.toast.Notifications.Location;
+import service.PhimService;
+import service.SanPhamService;
 
 public class ProductAddingDialog extends JDialog {
 	/**
@@ -36,7 +41,7 @@ public class ProductAddingDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 	private QuanLyDoAnGUI formFoodManagement;
-	private SanPhamDAO productDAO;
+	private SanPhamService productDAO;
 	private CrazyPanel container;
 	private JLabel imageSourceLabel;
 	private JButton imageSourceButton;
@@ -56,8 +61,8 @@ public class ProductAddingDialog extends JDialog {
 	private File selectedFile;
 //	private FormDrinkManagement formDrinkManagement;
 
-	public ProductAddingDialog(String type) {
-		productDAO = new SanPhamDAO(SanPham.class);
+	public ProductAddingDialog(String type) throws MalformedURLException, NotBoundException, RemoteException {
+		productDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
 //		setLayout(new BorderLayout());
 		initComponents(type);
 	}

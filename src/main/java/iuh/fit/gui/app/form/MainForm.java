@@ -8,6 +8,9 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JLayeredPane;
@@ -29,10 +32,10 @@ import iuh.fit.gui.app.nhanvien.NhanVienGUI;
 import iuh.fit.gui.app.phim.QuanLyPhimGUI;
 import iuh.fit.gui.app.sanpham.doan.QuanLyDoAnGUI;
 import iuh.fit.gui.app.sanpham.nuocuong.QuanLyNuocUongGUI;
-//import iuh.fit.gui.app.thongke.ThongKeDoanhThu;
-//import iuh.fit.gui.app.thongke.ThongKeKhachHang;
-//import iuh.fit.gui.app.thongke.ThongKePhim;
-//import iuh.fit.gui.app.thongke.ThongKeSanPham;
+import iuh.fit.gui.app.thongke.ThongKeDoanhThu;
+import iuh.fit.gui.app.thongke.ThongKeKhachHang;
+import iuh.fit.gui.app.thongke.ThongKePhim;
+import iuh.fit.gui.app.thongke.ThongKeSanPham;
 import iuh.fit.gui.menu.Menu;
 import iuh.fit.gui.menu.MenuAction;
 
@@ -81,27 +84,24 @@ public class MainForm extends JLayeredPane {
 
 	private void initMenuEvent(NhanVien employee) {
 		menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-			if (employee.getVaiTro().equalsIgnoreCase("Quản lý")) {
+			if (employee.getVaiTro().equalsIgnoreCase("Nhân viên quản lý")) {
 				switch (index) {
-					case 0:
-						Main.showMainForm(new QuanLyPhimGUI());
-						break;
-					case 1:
-						Main.showMainForm(new QuanLyLichChieuGUI(employee));
-						// System.out.println(employee);
-						break;
-					case 2:
+					case 0: //Quản lý nhân viên
 						Main.showMainForm(new NhanVienGUI(employee));
 						break;
-					case 3:
-						Main.showMainForm(new QuanLyKhachHangGUI());
+					case 1: //Quản lý khuyến mãi
+						Main.showMainForm(new QuanLyKhuyenMaiGUI());
+						// System.out.println(employee);
 						break;
-					case 4:
+					case 2: //Quản lý Phim
+						Main.showMainForm(new QuanLyPhimGUI());
+						break;
+					case 3: //Quản lý Đồ ăn & uống
 						switch (subIndex) {
-							case 1:
+							case 1: //Đồ ăn
 								Main.showMainForm(new QuanLyDoAnGUI());
 								break;
-							case 2:
+							case 2: //Nước uống
 								Main.showMainForm(new QuanLyNuocUongGUI());
 								break;
 							default:
@@ -109,29 +109,26 @@ public class MainForm extends JLayeredPane {
 								break;
 						}
 						break;
-					case 5:
-						Main.showMainForm(new QuanLyKhuyenMaiGUI());
-						break;
-					case 6:
+					case 4: // Thống kê
 						switch (subIndex) {
-							case 1:
-							//	Main.showMainForm(new ThongKeDoanhThu());
+							case 1: //Thống kê doanh thu
+								Main.showMainForm(new ThongKeDoanhThu());
 								break;
-							case 2:
-							//	Main.showMainForm(new ThongKeKhachHang());
+							case 2: //khách hàng
+								Main.showMainForm(new ThongKeKhachHang());
 								break;
-							case 3:
-							//	Main.showMainForm(new ThongKePhim());
+							case 3: //phim
+								Main.showMainForm(new ThongKePhim());
 								break;
-							case 4:
-							//	Main.showMainForm(new ThongKeSanPham());
+							case 4: //Sản phẩm
+								Main.showMainForm(new ThongKeSanPham());
 								break;
 							default:
 								action.cancel();
 								break;
 						}
 						break;
-					case 7:
+					case 5:
 						switch (subIndex) {
 							case 1:
 								 Main.showMainForm(new HoSoForm(employee));
@@ -144,8 +141,8 @@ public class MainForm extends JLayeredPane {
 								break;
 						}
 						break;
-					case 8:
-						 Main.logout();
+					case 6:
+						Main.logout();
 						break;
 					default:
 						action.cancel();
@@ -154,50 +151,31 @@ public class MainForm extends JLayeredPane {
 			} else {
 				switch (index) {
 					case 0:
-						Main.showMainForm(new QuanLyPhimGUI());
-						break;
-					case 1:
 						Main.showMainForm(new QuanLyLichChieuGUI(employee));
 						break;
-					case 3:
+					case 1:
 						Main.showMainForm(new QuanLyKhachHangGUI());
 						break;
-					case 4:
+					case 2: // Thống kê
 						switch (subIndex) {
-							case 1:
-								Main.showMainForm(new QuanLyDoAnGUI());
+							case 1: //Thống kê doanh thu
+								Main.showMainForm(new ThongKeDoanhThu());
 								break;
-							case 2:
-								Main.showMainForm(new QuanLyNuocUongGUI());
+							case 2: //khách hàng
+								Main.showMainForm(new ThongKeKhachHang());
+								break;
+							case 3: //phim
+								Main.showMainForm(new ThongKePhim());
+								break;
+							case 4: //Sản phẩm
+								Main.showMainForm(new ThongKeSanPham());
 								break;
 							default:
 								action.cancel();
 								break;
 						}
 						break;
-					case 5:
-						Main.showMainForm(new QuanLyKhuyenMaiGUI());
-						break;
-					case 6:
-						switch (subIndex) {
-							case 1:
-//								Main.showMainForm(new ThongKeDoanhThu());
-								break;
-							case 2:
-//								Main.showMainForm(new ThongKeKhachHang());
-								break;
-							case 3:
-//								Main.showMainForm(new ThongKePhim());
-								break;
-							case 4:
-//								Main.showMainForm(new ThongKeSanPham());
-								break;
-							default:
-								action.cancel();
-								break;
-						}
-						break;
-					case 7:
+					case 3:
 						switch (subIndex) {
 							case 1:
 								Main.showMainForm(new HoSoForm(employee));
@@ -210,8 +188,8 @@ public class MainForm extends JLayeredPane {
 								break;
 						}
 						break;
-					case 8:
-						 Main.logout();
+					case 4:
+						Main.logout();
 						break;
 					default:
 						action.cancel();
@@ -245,7 +223,7 @@ public class MainForm extends JLayeredPane {
 		panelBody.revalidate();
 	}
 
-	public void setSelectedMenu(int index, int subIndex) {
+	public void setSelectedMenu(int index, int subIndex) throws MalformedURLException, NotBoundException, RemoteException {
 		menu.setSelectedMenu(index, subIndex);
 	}
 

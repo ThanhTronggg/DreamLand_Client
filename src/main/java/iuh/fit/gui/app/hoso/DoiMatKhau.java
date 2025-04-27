@@ -2,6 +2,10 @@ package iuh.fit.gui.app.hoso;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -9,10 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
-import dao.TaiKhoanDAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
 import net.miginfocom.swing.MigLayout;
+import service.KhachHangService;
+import service.TaiKhoanService;
 
 public class DoiMatKhau extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -26,12 +31,12 @@ public class DoiMatKhau extends JPanel {
 	private JButton changePasswordButton;
 	private JLabel informationLabel;
 	private JLabel errorLabel;
-	private TaiKhoanDAO taiKhoanDAO;
+	private TaiKhoanService taiKhoanDAO;
 	private NhanVien nhanVien; // Khai báo biến nhanVien
 
-	public DoiMatKhau(NhanVien nhanVien) {
+	public DoiMatKhau(NhanVien nhanVien) throws MalformedURLException, NotBoundException, RemoteException {
 		this.nhanVien = nhanVien; // Khởi tạo nhanVien
-		taiKhoanDAO = new TaiKhoanDAO(TaiKhoan.class);
+		taiKhoanDAO = (TaiKhoanService) Naming.lookup("rmi://XXXXXX:9090/taiKhoanService");
 		initComponents(nhanVien);
 	}
 
@@ -65,7 +70,13 @@ public class DoiMatKhau extends JPanel {
 		// Nút đổi mật khẩu
 		changePasswordButton = new JButton("Đổi mật khẩu");
 		changePasswordButton.setFont(new Font("Arial", Font.BOLD, 14));
-		changePasswordButton.addActionListener(e -> handleChangePassword());
+		changePasswordButton.addActionListener(e -> {
+            try {
+                handleChangePassword();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 		add(changePasswordButton, "span 2, center");
 
 		// Nhãn hiển thị lỗi
@@ -74,7 +85,7 @@ public class DoiMatKhau extends JPanel {
 		add(errorLabel, "span 2, center");
 	}
 
-	private void handleChangePassword() {
+	private void handleChangePassword() throws RemoteException {
 		String currentPassword = new String(currentPasswordTextField.getPassword());
 		String newPassword = new String(newPasswordTextField.getPassword());
 		String confirmPassword = new String(confirmNewPasswordTextField.getPassword());

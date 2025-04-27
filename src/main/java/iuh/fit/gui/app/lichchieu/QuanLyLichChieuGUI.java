@@ -2,6 +2,10 @@ package iuh.fit.gui.app.lichchieu;
 
 import java.awt.*; 
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,13 +28,13 @@ import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
 
 import net.miginfocom.swing.MigLayout;
-import dao.LichChieuDAO;
 import dao.PhimDAO;
 import entity.LichChieu;
 import entity.NhanVien;
 import entity.Phim;
 import iuh.fit.gui.app.khuyenmai.SuaKhuyenMaiDialog;
 import iuh.fit.gui.app.khuyenmai.ThemKhuyenMaiDialog;
+import service.LichChieuService;
 
 public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
     
@@ -41,7 +45,7 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
     private JTable table;
     private JPanel pnlChiTiet;
     private ArrayList<LichChieu> dsLichChieu;
-    private LichChieuDAO lichChieuDAO;
+    private LichChieuService lichChieuDAO;
     private PhimDAO phimDAO;
     
     private JLabel lblTenPhim;
@@ -59,11 +63,11 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
 	private JScrollPane scrollPane;
 	private NhanVien nhanVienHienTai;
     
-    public QuanLyLichChieuGUI(NhanVien nv) {
+    public QuanLyLichChieuGUI(NhanVien nv) throws MalformedURLException, NotBoundException, RemoteException {
     	setLayout(new BorderLayout());
 		
     	pnlLichChieu = new JPanel();
-    	lichChieuDAO = new LichChieuDAO(LichChieu.class);
+		lichChieuDAO = (LichChieuService) Naming.lookup("rmi://XXXXXX:9090/lichChieuService");
     	this.nhanVienHienTai = nv;
 //    	System.out.println("QLLCGUI " + nhanVienHienTai);
     	
@@ -152,24 +156,36 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
 			
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				loadLichChieu();
-			}
+                try {
+                    loadLichChieu();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 			
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				loadLichChieu();
-			}
+                try {
+                    loadLichChieu();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 			
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				loadLichChieu();
-			}
+                try {
+                    loadLichChieu();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 		});
         btnThem.addActionListener(this);
         loadLichChieu();
     }
 
-    public void loadLichChieu() {
+    public void loadLichChieu() throws RemoteException {
         pnlLichChieu.removeAll();
         pnlLichChieu.setLayout(new GridLayout(0, 3, 10, 10));
 
@@ -199,8 +215,17 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
         		JButton screeningButton = new JButton(lc.getGioBatDau().format(hourFormatter) + " ~ " + lc.getGioKetThuc().format(hourFormatter));
         		pnlRow4.add(screeningButton);
         		screeningButton.addActionListener(e -> {
-        			ChonGheDialog chonGhediaLog = new ChonGheDialog(lc);
-        			chonGhediaLog.pack();
+                    ChonGheDialog chonGhediaLog = null;
+                    try {
+                        chonGhediaLog = new ChonGheDialog(lc);
+                    } catch (MalformedURLException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (NotBoundException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    chonGhediaLog.pack();
         			chonGhediaLog.setModal(true);
         			chonGhediaLog.setVisible(true);
         			chonGhediaLog.setQuanLyLichChieuGUI(this); 
@@ -253,8 +278,17 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
         		JButton screeningButton = new JButton(lc.getGioBatDau().format(hourFormatter) + " ~ " + lc.getGioKetThuc().format(hourFormatter));
         		pnlRow4.add(screeningButton);
         		screeningButton.addActionListener(e -> {
-        			ChonGheDialog chonGhediaLog = new ChonGheDialog(lc);
-        			chonGhediaLog.setNhanVienHienTai(nhanVienHienTai);
+                    ChonGheDialog chonGhediaLog = null;
+                    try {
+                        chonGhediaLog = new ChonGheDialog(lc);
+                    } catch (MalformedURLException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (NotBoundException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    chonGhediaLog.setNhanVienHienTai(nhanVienHienTai);
         			chonGhediaLog.setQuanLyLichChieuGUI(this);        			
         			System.out.println("QLLCGUI " + nhanVienHienTai);
         			chonGhediaLog.pack();
@@ -284,11 +318,16 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o.equals(btnThem)) {
-			them();
-		}
+            try {
+                them();
+            } catch (Exception ex) {
+				ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+        }
 	}
 	
-	private void them() {
+	private void them() throws MalformedURLException, NotBoundException, RemoteException {
 		ThemLichChieuDialog themLC = new ThemLichChieuDialog(QuanLyLichChieuGUI);
 		themLC.setModal(true);
 		themLC.setVisible(true);

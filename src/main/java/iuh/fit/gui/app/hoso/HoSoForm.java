@@ -2,6 +2,10 @@ package iuh.fit.gui.app.hoso;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
@@ -14,9 +18,10 @@ import javax.swing.JTextField;
 
 import com.toedter.calendar.JDateChooser;
 
-import dao.NhanVienDAO;
 import entity.NhanVien;
 import net.miginfocom.swing.MigLayout;
+import service.NhanVienService;
+import service.TaiKhoanService;
 
 public class HoSoForm extends JPanel {
 	private JTextField txtFullName, txtEmail, txtPhone;
@@ -49,7 +54,17 @@ public class HoSoForm extends JPanel {
 		btnUpdate.setFont(new Font("Arial", Font.BOLD, 16));
 		btnUpdate.setBackground(new Color(70, 130, 180));
 		btnUpdate.setForeground(Color.WHITE);
-		btnUpdate.addActionListener(event -> updateEmployee(nhanVien));
+		btnUpdate.addActionListener(event -> {
+            try {
+                updateEmployee(nhanVien);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (NotBoundException e) {
+                throw new RuntimeException(e);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
 		formPanel.add(btnUpdate, "span 2, center");
 
 		add(formPanel);
@@ -123,7 +138,7 @@ public class HoSoForm extends JPanel {
 		return dateChooser;
 	}
 
-	private void updateEmployee(NhanVien nhanVien) {
+	private void updateEmployee(NhanVien nhanVien) throws MalformedURLException, NotBoundException, RemoteException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		String fullName = txtFullName.getText();
@@ -143,7 +158,7 @@ public class HoSoForm extends JPanel {
 		nhanVien.setNgaySinh(java.time.LocalDate.parse(birthDateStr));
 		nhanVien.setNgayBatDauLam(java.time.LocalDate.parse(startDateStr));
 
-		NhanVienDAO dao = new NhanVienDAO(NhanVien.class);
+		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
 		if (dao.update(nhanVien)) {
 			javax.swing.JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
 		} else {

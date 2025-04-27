@@ -20,6 +20,10 @@ import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,6 +53,9 @@ import entity.LichChieu;
 import entity.NhanVien;
 import entity.Ve;
 import iuh.fit.gui.app.Main;
+import service.GheService;
+import service.LichChieuService;
+import service.VeService;
 
 /**
  * @description:
@@ -59,7 +66,7 @@ import iuh.fit.gui.app.Main;
 
 public class ChonGheDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private GheDAO gheDAO;
+    private GheService gheDAO;
     private ArrayList<Ghe> danhSachGheDaChon;
     private JLabel thoiGianChieu;
     private JLabel phong;
@@ -69,7 +76,7 @@ public class ChonGheDialog extends JDialog {
     private double tongTienDouble;
     private NhanVien nhanVienHienTai;
     private QuanLyLichChieuGUI quanLyLichChieuGUI;
-	private VeDAO veDao;
+	private VeService veDao;
 	private JButton btnGheTrong;
 	private JButton btnGheDaDat;
 	private JPanel pnlKhungChinh;
@@ -87,7 +94,7 @@ public class ChonGheDialog extends JDialog {
 		this.quanLyLichChieuGUI = quanLyLichChieuGUI;
 	}
 
-	public ChonGheDialog(LichChieu lichChieu) {
+	public ChonGheDialog(LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
 		
 		setLayout(new BorderLayout());
 		
@@ -98,8 +105,8 @@ public class ChonGheDialog extends JDialog {
 		
         this.setSize(1700, 1000);
         
-        veDao = new VeDAO(Ve.class);
-        gheDAO = new GheDAO(Ghe.class);
+        veDao = (VeService) Naming.lookup("rmi://XXXXXX:9090/veService");
+        gheDAO = (GheService) Naming.lookup("rmi://XXXXXX:9090/gheService");
         pnlKhungChinh = new JPanel();
         pnlKhungChinh.setLayout(new BorderLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -175,7 +182,17 @@ public class ChonGheDialog extends JDialog {
         btnTiepTuc = new JButton("Tiếp tục");
         btnTiepTuc.putClientProperty(FlatClientProperties.STYLE, "arc:5;hoverBackground:$primary;hoverForeground:$clr-white");
         btnTiepTuc.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnTiepTuc.addActionListener(e -> xuLyNutTiepTuc(lichChieu));
+        btnTiepTuc.addActionListener(e -> {
+            try {
+                xuLyNutTiepTuc(lichChieu);
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         pnlKhungPhai.add(btnTiepTuc);
         pnlKhungPhai.add(Box.createVerticalStrut(20));
         
@@ -438,7 +455,7 @@ public class ChonGheDialog extends JDialog {
         tongTien.setText(new DecimalFormat("#").format(tongTienDouble)+ " VND");
     }
 
-    private void xuLyNutTiepTuc(LichChieu lichChieu) {
+    private void xuLyNutTiepTuc(LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
         if (!danhSachGheDaChon.isEmpty()) {
             ChonSanPhamDialog dialogSanPham = new ChonSanPhamDialog(danhSachGheDaChon, lichChieu);
             dialogSanPham.setNhanVienHienTai(nhanVienHienTai);

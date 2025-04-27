@@ -13,10 +13,18 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -44,6 +52,7 @@ import dao.VeDAO;
 import entity.*;
 import iuh.fit.gui.other.TaoHoaDon;
 import iuh.fit.gui.other.TaoVe;
+import service.*;
 
 /**
  * @description:
@@ -64,13 +73,13 @@ public class ThanhToanDialog extends JDialog {
 
     private JTextArea txtGhiChu;
 
-    private KhachHangDAO khachHangDAO;
-    private SanPhamDAO sanPhamDAO;
+    private KhachHangService khachHangDAO;
+    private SanPhamService sanPhamDAO;
     private NhanVien nhanVienHienTai;
-    private ChiTietHoaDonDAO chiTietDonHangDAO;
+    private ChiTietHoaDonService chiTietDonHangDAO;
     private ChonSanPhamDialog chonSanPhamDialog;
 
-	private KhuyenMaiDAO khuyenMaiDAO;
+	private KhuyenMaiService khuyenMaiDAO;
 
 	private JLabel lblLoiTen;
 
@@ -78,19 +87,20 @@ public class ThanhToanDialog extends JDialog {
 
 	private JLabel lblLoiEmail;
 
-	private VeDAO veDao;
+	private VeService veDao;
 
-	private HoaDonDAO hoaDonDAO;
+	private HoaDonService hoaDonDAO;
 
-    public ThanhToanDialog(ArrayList<Ghe> danhSachGheDaChon, ArrayList<ChiTietHoaDon> danhSachChiTietSanPham, LichChieu lichChieu) {
+    public ThanhToanDialog(ArrayList<Ghe> danhSachGheDaChon, ArrayList<ChiTietHoaDon> danhSachChiTietSanPham, LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
 
-        khachHangDAO = new KhachHangDAO(KhachHang.class);
-        sanPhamDAO = new SanPhamDAO(SanPham.class);
-        chiTietDonHangDAO = new ChiTietHoaDonDAO(ChiTietHoaDon.class);
-        veDao = new VeDAO(Ve.class);
-        hoaDonDAO = new HoaDonDAO(HoaDon.class);
-        khuyenMaiDAO = new KhuyenMaiDAO(KhuyenMai.class);
-
+        khachHangDAO = (KhachHangService) Naming.lookup("rmi://XXXXXX:9090/khachHangService");
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
+        chiTietDonHangDAO = (ChiTietHoaDonService) Naming.lookup("rmi://XXXXXX:9090/chiTietHoaDonService");
+        veDao = (VeService) Naming.lookup("rmi://XXXXXX:9090/veService");
+        hoaDonDAO = (HoaDonService) Naming.lookup("rmi://XXXXXX:9090/hoaDonService");
+        khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://XXXXXX:9090/khuyenMaiService");
+        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://localhost:9090/idGeneratorService");
+        DecimalFormat df = new DecimalFormat("#,##0.00");
         JPanel pnlChinh = new JPanel(new BorderLayout());
 
 
@@ -170,18 +180,30 @@ public class ThanhToanDialog extends JDialog {
         
         txtSoDienThoai.getDocument().addDocumentListener(new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e) {
-            	if (!validateSDT()) {
-                    return;
+                try {
+                    if (!validateSDT()) {
+return;
+}
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
             @Override public void removeUpdate(DocumentEvent e) {
-            	if (!validateSDT()) {
-                    return;
+                try {
+                    if (!validateSDT()) {
+return;
+}
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
             @Override public void changedUpdate(DocumentEvent e) {
-            	if (!validateSDT()) {
-                    return;
+                try {
+                    if (!validateSDT()) {
+                        return;
+}
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });
@@ -280,7 +302,7 @@ public class ThanhToanDialog extends JDialog {
 
         JPanel pnlGiaVe = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pnlGiaVe.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        JLabel lblGiaVe = new JLabel(lichChieu.getGiaMotGhe() + " VND");
+        JLabel lblGiaVe = new JLabel(df.format(lichChieu.getGiaMotGhe()) + " VND");
         pnlGiaVe.add(new JLabel("Giá vé: "));
         pnlGiaVe.add(lblGiaVe);
         pnlChiTiet.add(pnlGiaVe);
@@ -313,7 +335,7 @@ public class ThanhToanDialog extends JDialog {
         		tongTienVe += lichChieu.getGiaMotGhe();
         	}
         }
-        JLabel lblTongTienPhim = new JLabel(tongTienVe + " VND");
+        JLabel lblTongTienPhim = new JLabel(df.format(tongTienVe) + " VND");
         pnlTongTienPhim.add(new JLabel("Tổng: "));
         pnlTongTienPhim.add(lblTongTienPhim);
         pnlPhim.add(pnlTongTienPhim, BorderLayout.SOUTH);
@@ -345,7 +367,7 @@ public class ThanhToanDialog extends JDialog {
         	lblTenSanPham.setFont(new Font(lblTenSanPham.getFont().getFontName(), 1, lblTenSanPham.getFont().getSize()));
         	pnlTemp1.add(lblTenSanPham, BorderLayout.WEST);
         	
-        	JLabel lblTong = new JLabel(ct.getSoLuong() + "*"+ ct.getSanPham().getGiaBan() + " VND");
+        	JLabel lblTong = new JLabel(ct.getSoLuong() + " x "+ ct.getSanPham().getGiaBan() + " VND");
         	pnlTemp1.add(lblTong, BorderLayout.EAST);
         	
         	pnlDanhSachSP.add(pnlTemp3);
@@ -360,7 +382,7 @@ public class ThanhToanDialog extends JDialog {
         for (ChiTietHoaDon ct : danhSachChiTietSanPham) {
         	tongTienSP += ct.getSoLuong()*ct.getSanPham().getGiaBan();
         }
-        lblTongTienSP = new JLabel(tongTienSP + " VND");   
+        lblTongTienSP = new JLabel(df.format(tongTienSP) + " VND");
         pnlTongTienSP.add(new JLabel("Tổng: "));
         pnlTongTienSP.add(lblTongTienSP);
         pnlSanPham.add(pnlTongTienSP, BorderLayout.SOUTH);
@@ -377,20 +399,20 @@ public class ThanhToanDialog extends JDialog {
         pnlThanhToan.add(pnlDanhSachThanhToan, BorderLayout.NORTH);
         
         JPanel pnlTongTienPhim2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblTongTienPhim2 = new JLabel(tongTienVe + " VND");
+        JLabel lblTongTienPhim2 = new JLabel(df.format(tongTienVe) + " VND");
         pnlTongTienPhim2.add(new JLabel("Tổng tiền vé: "));
         pnlTongTienPhim2.add(lblTongTienPhim2);
         pnlDanhSachThanhToan.add(pnlTongTienPhim2);
         
         JPanel pnlTongTienSP2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblTongTienSP2 = new JLabel(tongTienSP + " VND");   
+        JLabel lblTongTienSP2 = new JLabel(df.format(tongTienSP) + " VND");
         pnlTongTienSP2.add(new JLabel("Tổng tiền đồ ăn & uống: "));
         pnlTongTienSP2.add(lblTongTienSP2);
         pnlDanhSachThanhToan.add(pnlTongTienSP2);
         
         double VAT = 0.1;
         JPanel pnlVAT = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblVAT = new JLabel((tongTienSP + tongTienVe)*VAT + " VND");   
+        JLabel lblVAT = new JLabel(df.format((tongTienSP + tongTienVe)*VAT) + " VND");
         pnlVAT.add(new JLabel("VAT: "));
         pnlVAT.add(lblVAT);
         pnlDanhSachThanhToan.add(pnlVAT);
@@ -403,13 +425,13 @@ public class ThanhToanDialog extends JDialog {
         	phanTram = km1.getPhanTramKhuyenMai();
         }
         JPanel pnlKhuyenMai = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblKhuyenMai = new JLabel(phanTram*100 + "%");  
+        lblKhuyenMai = new JLabel(df.format(phanTram*100) + "%");
         pnlKhuyenMai.add(new JLabel("Khuyến mãi: "));
         pnlKhuyenMai.add(lblKhuyenMai);
         pnlDanhSachThanhToan.add(pnlKhuyenMai);
         
         JPanel pnlTongTien = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblTongTien = new JLabel(((tongTienSP + tongTienVe)*VAT + (tongTienSP + tongTienVe))* (1- phanTram) + " VND"); 
+        JLabel lblTongTien = new JLabel(df.format(((tongTienSP + tongTienVe)*VAT + (tongTienSP + tongTienVe))* (1- phanTram)) + " VND");
         JLabel lblTongtien2 = new JLabel("Tổng tiền: ");
 //        JLabel lblTemp = new JLabel("-------------------------------------------------------------------------------------------");
         lblTongTien.putClientProperty(FlatClientProperties.STYLE, "font:$h5.font;foreground:$danger;");
@@ -430,85 +452,118 @@ public class ThanhToanDialog extends JDialog {
         pnlBtnThanhToan.add(btnThanhToan);
         pnlBtnThanhToan.add(Box.createVerticalStrut(20));
         btnThanhToan.addActionListener(e -> {
-        	if (!validateSDT() || !validateTen() || !validateEmail()) {
-                return;
-            }
-//        	System.out.println(1);
-        	boolean tonTaiKhachHang = khachHangDAO.kiemTraSoDienThoaiTonTai(txtSoDienThoai.getText().trim());
-        	String maKhachHang;
-        	if(tonTaiKhachHang) {
-        		maKhachHang  = khachHangDAO.capNhatTenVaEmailKhachHangTheoSoDienThoai(txtSoDienThoai.getText().trim(), txtTen.getText().trim(), txtEmail.getText().trim());
-        	}
-        	else {
-                KhachHang khachHang = new KhachHang();
-                khachHang.setSoDienThoai(txtSoDienThoai.getText().trim());
-                khachHang.setTenKhachHang(txtTen.getText().trim());
-                khachHang.setEmail(txtEmail.getText().trim());
-//                khachHang.setMaKhachHang(getNextSequenceValue(em, "KhachHangSequence", "KH", 6));
-        		maKhachHang = String.valueOf(khachHangDAO.add(khachHang));
-        	}
-        	
-        	for (ChiTietHoaDon ct : danhSachChiTietSanPham) {
-				sanPhamDAO.giamSoLuongSanPham(String.valueOf(ct.getSanPham().getMaSanPham()), ct.getSoLuong());
-			}
-			
-			int soLuongGhe = danhSachGheDaChon.size();
-//			String note = txtGhiChu.getText().trim();
-			String note = " ";
-//			System.out.println(nhanVienHienTai);
-            KhachHang khachHang = new KhachHang();
-            khachHang.setMaKhachHang(maKhachHang);
-            khachHang.setTenKhachHang(txtTen.getText().trim());
-            khachHang.setSoDienThoai(txtSoDienThoai.getText().trim());
-            khachHang.setEmail(txtEmail.getText().trim());
-//			HoaDon hd = new HoaDon(LocalDateTime.now(), soLuongGhe, note, khachHang, nhanVienHienTai, km1, VAT);
-            HoaDon hd = new HoaDon();
-            hd.setNgayDat(LocalDate.from(LocalDateTime.now()));
-            hd.setSoGhe(soLuongGhe);
-            hd.setGhiChu(note);
-            hd.setKhachHang(khachHang);
-            hd.setNhanVien(nhanVienHienTai);
-            hd.setKhuyenMai(km1);
-            hd.setVAT(VAT);
-			hd.setTongTien(danhSachChiTietSanPham, danhSachGheDaChon, lichChieu);
-			String maHoaDon = String.valueOf(hoaDonDAO.add(hd));
-			hd.setMaHoaDon(maHoaDon);
-			
-			for (ChiTietHoaDon ct: danhSachChiTietSanPham) {
-				ct.setHoaDon(hd);
-			}
-			
-			ArrayList<Ve> danhSachVeMoi = new ArrayList<>();
-			for (Ghe ghe : danhSachGheDaChon) {
-			    Ve ve = new Ve();
-			    ve.setGhe(ghe);
-			    ve.setHoaDon(hd);
-			    ve.setNgayPhatHanh(LocalDate.now());
-			    ve.setLichChieu(lichChieu);
+            try {
+                // Kiểm tra dữ liệu đầu vào
+                if (!validateSDT() || !validateTen() || !validateEmail()) {
+                    return;
+                }
 
-			    danhSachVeMoi.add(ve);
-			}
-			
-			if(maHoaDon != null) {
-				for (ChiTietHoaDon ct: danhSachChiTietSanPham) {
-					chiTietDonHangDAO.add(ct);
-				}
-				
-				for (Ve ve: danhSachVeMoi) {
-					String maVe = String.valueOf(veDao.add(ve));
-					ve.setMaVe(maVe);
-				}
-				JOptionPane.showMessageDialog(this, "Đơn hàng đã được thêm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-				for(Ve ve : danhSachVeMoi) {
-					TaoVe.taoVe(ve);
-				}
-				TaoHoaDon.taoHD(danhSachChiTietSanPham, danhSachVeMoi, hd);
-				this.dispose();
-				chonSanPhamDialog.dispose();
-				chonSanPhamDialog.disposeChonGheDialog();
-			} else {
-				JOptionPane.showMessageDialog(this, "Có lỗi xảy ra", "Lỗi", JOptionPane.ERROR_MESSAGE);
-			}
+                // Kiểm tra hoặc tạo KhachHang
+                boolean tonTaiKhachHang = khachHangDAO.kiemTraSoDienThoaiTonTai(txtSoDienThoai.getText().trim());
+                KhachHang khachHang;
+                String maKhachHang;
+
+                if (tonTaiKhachHang) {
+                    // Lấy KhachHang hiện có (managed entity)
+                    khachHang = khachHangDAO.timKhachHangTheoSoDienThoai(txtSoDienThoai.getText().trim());
+                    // Cập nhật thông tin nếu cần
+                    khachHangDAO.capNhatTenVaEmailKhachHangTheoSoDienThoai(
+                            txtSoDienThoai.getText().trim(),
+                            txtTen.getText().trim(),
+                            txtEmail.getText().trim()
+                    );
+                    maKhachHang = khachHang.getMaKhachHang();
+                } else {
+                    // Tạo và lưu KhachHang mới
+                    maKhachHang = idGeneratorService.getNextId("KhachHang");
+                    khachHang = new KhachHang();
+                    khachHang.setMaKhachHang(maKhachHang);
+                    khachHang.setSoDienThoai(txtSoDienThoai.getText().trim());
+                    khachHang.setTenKhachHang(txtTen.getText().trim());
+                    khachHang.setEmail(txtEmail.getText().trim());
+                    khachHangDAO.add(khachHang); // Lưu KhachHang
+                    // Lấy lại managed entity để đảm bảo KhachHang đã được lưu
+                    khachHang = khachHangDAO.timKhachHangTheoSoDienThoai(txtSoDienThoai.getText().trim());
+                }
+
+                // Cập nhật số lượng sản phẩm
+                for (ChiTietHoaDon ct : danhSachChiTietSanPham) {
+                    sanPhamDAO.giamSoLuongSanPham(String.valueOf(ct.getSanPham().getMaSanPham()), ct.getSoLuong());
+                }
+
+                // Tạo HoaDon
+                HoaDon hd = new HoaDon();
+                hd.setMaHoaDon(idGeneratorService.getNextId("HoaDon"));
+                hd.setNgayDat(LocalDate.from(LocalDateTime.now()));
+                hd.setSoGhe(danhSachGheDaChon.size());
+                hd.setGhiChu(" ");
+                hd.setKhachHang(khachHang); // KhachHang đã là managed entity
+                hd.setNhanVien(nhanVienHienTai);
+                hd.setKhuyenMai(km1);
+                hd.setVAT(VAT);
+
+                // Tạo danh sách ChiTietHoaDon
+                Set<ChiTietHoaDon> danhSachCTHD = new HashSet<>();
+                for (ChiTietHoaDon ct : danhSachChiTietSanPham) {
+                    ct.setHoaDon(hd);
+                    SanPham sanPham = sanPhamDAO.findById(ct.getSanPham().getMaSanPham()); // Đảm bảo SanPham là managed entity
+                    ct.setSanPham(sanPham);
+                    ct.setThanhTien(ct.getSoLuong() * sanPham.getGiaBan());
+                    danhSachCTHD.add(ct);
+                }
+                hd.setDanhSachChiTietHD(danhSachCTHD);
+
+                // Tạo danh sách Ve
+                Set<Ve> danhSachVeMoi = new HashSet<>();
+                for (Ghe ghe : danhSachGheDaChon) {
+                    Ve ve = new Ve();
+                    ve.setMaVe(idGeneratorService.getNextId("Ve"));
+                    ve.setGhe(ghe);
+                    ve.setHoaDon(hd);
+                    ve.setNgayPhatHanh(LocalDate.now());
+                    ve.setLichChieu(lichChieu);
+                    danhSachVeMoi.add(ve);
+                }
+                hd.setDanhSachVe(danhSachVeMoi);
+                hd.setTongTien(danhSachChiTietSanPham, danhSachGheDaChon, lichChieu);
+
+                // Lưu HoaDon
+                hoaDonDAO.add(hd);
+
+                // Lưu ChiTietHoaDon
+                for (ChiTietHoaDon ct : danhSachCTHD) {
+                    ChiTietHoaDonPK pk = new ChiTietHoaDonPK(hd, ct.getSanPham());
+                    ct.setId(pk);
+                    chiTietDonHangDAO.add(ct);
+                }
+
+                // Lưu Ve
+                for (Ve ve : danhSachVeMoi) {
+                    veDao.add(ve);
+                }
+
+                // Thông báo thành công và tạo tài liệu
+                JOptionPane.showMessageDialog(this, "Đơn hàng đã được thêm thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                for (Ve ve : danhSachVeMoi) {
+                    TaoVe.taoVe(ve);
+                }
+
+                ArrayList<Ve> danhSachVe = new ArrayList<>();
+
+                for (Ve ve: danhSachVeMoi) {
+                    danhSachVe.add(ve);
+                }
+                TaoHoaDon.taoHD(danhSachChiTietSanPham, danhSachVe, hd);
+
+                // Đóng dialog
+                this.dispose();
+                chonSanPhamDialog.dispose();
+                chonSanPhamDialog.disposeChonGheDialog();
+
+            } catch (RemoteException ex) {
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException(ex);
+            }
         });
         pnlThanhToan.add(pnlBtnThanhToan, BorderLayout.SOUTH);
 
@@ -519,33 +574,33 @@ public class ThanhToanDialog extends JDialog {
     }
     
     private boolean validateTen() {
-//        String ten = txtTen.getText().trim();
-//        if (ten.isEmpty()) {
-//            lblLoiTen.setText("Tên không được để trống");
-//            txtTen.requestFocus();
-//            return false;
-//        }
-//        if (!ten.matches("[aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTu UùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ0-9/-_ ]+")) {
-//            lblLoiTen.setText("Tên không chứa ký tự không hợp lệ");
-//            return false;
-//        }
-//        lblLoiTen.setText("*");
+        String ten = txtTen.getText().trim();
+        if (ten.isEmpty()) {
+            lblLoiTen.setText("Tên không được để trống");
+            txtTen.requestFocus();
+            return false;
+        }
+        if (!ten.matches("[aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTu UùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ0-9/-_ ]+")) {
+            lblLoiTen.setText("Tên không chứa ký tự không hợp lệ");
+            return false;
+        }
+        lblLoiTen.setText("*");
         return true;
     }
 
     
     private boolean validateEmail() {
-//        String email = txtEmail.getText().trim();
-//        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-//            lblLoiEmail.setText("Email phải đúng định dạng");
-//            return false;
-//        }
-//        lblLoiEmail.setText("");
+        String email = txtEmail.getText().trim();
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            lblLoiEmail.setText("Email phải đúng định dạng");
+            return false;
+        }
+        lblLoiEmail.setText("");
         return true;
     }
 
     
-    private boolean validateSDT() {
+    private boolean validateSDT() throws RemoteException {
         String soDienThoai = txtSoDienThoai.getText().trim();
         if (soDienThoai.isEmpty()) {
             lblLoiSoDienThoai.setText("Số điện thoại không được để trống");
@@ -561,9 +616,6 @@ public class ThanhToanDialog extends JDialog {
         if (khachHang != null) {
             txtTen.setText(khachHang.getTenKhachHang());
             txtEmail.setText(khachHang.getEmail());
-        } else {
-            txtTen.setText("");
-            txtEmail.setText("");
         }
         return true;
     }

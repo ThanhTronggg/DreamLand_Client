@@ -4,12 +4,16 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import com.toedter.calendar.JDateChooser; 
-import dao.PhimDAO;
 import entity.Phim;
+import service.PhimService;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -24,11 +28,11 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
     private JButton btnThem, btnThoat, btnChonAnh;
     private JLabel lblHinhChon;
     private String pathAnh;
-    private PhimDAO phimDao;
+    private PhimService phimDao;
     private Phim phim;
 
-    public ThemPhimDialog() {
-        phimDao = new PhimDAO(Phim.class);
+    public ThemPhimDialog() throws MalformedURLException, NotBoundException, RemoteException {
+        phimDao = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
 
         setTitle("Thêm Phim");
         setSize(800, 500);
@@ -201,7 +205,11 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnThem) {
-            them();
+            try {
+                them();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         } else if (e.getSource() == btnThoat) {
             int result = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn thoát? \nMọi thay đổi sẽ không được lưu.",
                     "Chú ý", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -211,7 +219,7 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
         }
     }
 //
-    private void setMaPhim() {
+    private void setMaPhim() throws RemoteException {
         lblMaPhim.setText(phimDao.getNextMaPhim());
     }
 
@@ -231,7 +239,7 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
         }
     }
 
-    private void them() {
+    private void them() throws RemoteException {
         this.phim = kiemTraDieuKien();
         if (this.phim != null) {
             if (phimDao.add(this.phim)) { // Thêm phim vào cơ sở dữ liệu

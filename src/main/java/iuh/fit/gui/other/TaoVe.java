@@ -58,7 +58,7 @@ public class TaoVe {
 
     private static Font getFont(float size, int style) {
         try {
-            String fontPath = "gui/resources/fonts/Roboto-Regular.ttf";
+            String fontPath = "fonts/Roboto-Regular.ttf";
             com.itextpdf.text.pdf.BaseFont baseFont = com.itextpdf.text.pdf.BaseFont.createFont(fontPath, com.itextpdf.text.pdf.BaseFont.IDENTITY_H, com.itextpdf.text.pdf.BaseFont.EMBEDDED);
             return new Font(baseFont, size, style);
         } catch (Exception e) {
@@ -70,7 +70,7 @@ public class TaoVe {
     public static void taoVe(Ve ghe) {
         String defaultFolderPath = "data/";
         String fileName = ghe.getMaVe() + "_ticket.pdf";
-
+        DecimalFormat df = new DecimalFormat("#,##0.00");
         Document document = new Document(new Rectangle(400, 800));
 
         try {
@@ -100,7 +100,7 @@ public class TaoVe {
             document.add(new Paragraph("Phim: " + ghe.getLichChieu().getPhim().getTenPhim() + "\n", getFont(12, Font.NORMAL)));
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.ENGLISH);
             document.add(new Paragraph("Thời gian: " + ghe.getLichChieu().getGioBatDau().format(dateFormatter) + "\n", getFont(12, Font.NORMAL)));
-            document.add(new Paragraph("Phòng: " + ghe.getLichChieu().getPhong() + "\n", getFont(12, Font.NORMAL)));
+            document.add(new Paragraph("Phòng: " + ghe.getLichChieu().getPhong().getTenPhong() + "\n", getFont(12, Font.NORMAL)));
             double giaVe = 0;
         	if(ghe.getGhe().getLoaiGhe().getTenLoaiGhe().equals("Ghế đôi Sweetbox")) {
         		giaVe = ghe.getLichChieu().getGiaMotGhe()*2;
@@ -111,14 +111,14 @@ public class TaoVe {
         	if(ghe.getGhe().getLoaiGhe().getTenLoaiGhe().equals("Ghế thường")) {
         		giaVe = ghe.getLichChieu().getGiaMotGhe();
         	}
-        	document.add(new Paragraph("Giá vé: " + Double.toString(giaVe) + "\n", getFont(12, Font.NORMAL)));
+        	document.add(new Paragraph("Giá vé: " + df.format(giaVe) + "\n", getFont(12, Font.NORMAL)));
         	
         	document.add(new Paragraph("===========================================================\n", getFont(10, Font.NORMAL)));
         	
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Map<EncodeHintType, Object> hintMap = new HashMap<>();
             hintMap.put(EncodeHintType.MARGIN, 1);
-            BitMatrix qrCodeMatrix = new MultiFormatWriter().encode(String.valueOf(ghe.getHoaDon().getMaHoaDon()), BarcodeFormat.QR_CODE, 150, 150, hintMap);
+            BitMatrix qrCodeMatrix = new MultiFormatWriter().encode(String.valueOf(ghe.getMaVe()), BarcodeFormat.QR_CODE, 150, 150, hintMap);
             MatrixToImageWriter.writeToStream(qrCodeMatrix, "PNG", baos);
             Image qrCodeImage = Image.getInstance(baos.toByteArray());
             qrCodeImage.setAlignment(Element.ALIGN_CENTER);

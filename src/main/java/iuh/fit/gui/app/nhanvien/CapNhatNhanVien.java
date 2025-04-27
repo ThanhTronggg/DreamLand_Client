@@ -2,6 +2,10 @@ package iuh.fit.gui.app.nhanvien;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -20,6 +24,7 @@ import com.toedter.calendar.JDateChooser;
 
 import dao.NhanVienDAO;
 import entity.NhanVien;
+import service.NhanVienService;
 
 public class CapNhatNhanVien extends JFrame {
 	private JTextField txtFullName, txtEmail, txtPhone;
@@ -74,7 +79,14 @@ public class CapNhatNhanVien extends JFrame {
 		btnUpdate.setBackground(new Color(70, 130, 180));
 		btnUpdate.setForeground(Color.WHITE);
 		btnUpdate.setFont(new Font("Arial", Font.BOLD, 16));
-		btnUpdate.addActionListener(event -> updateEmployee(nhanVien));
+		btnUpdate.addActionListener(event -> {
+            try {
+                updateEmployee(nhanVien);
+            } catch (Exception e) {
+				e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
 
 		// Add panels to the form panel
 		formPanel.add(leftPanel);
@@ -104,7 +116,7 @@ public class CapNhatNhanVien extends JFrame {
 		txtEmail = createTextField(150, 40, 200, 40, nhanVien.getEmail());
 		txtPhone = createTextField(150, 90, 200, 40, nhanVien.getSoDienThoai());
 
-		cboEmployeeRole = new JComboBox<>(new String[] { "Nhân viên", "Quản lý" });
+		cboEmployeeRole = new JComboBox<>(new String[] { "Nhân viên bán vé", "Nhân viên quản lý" });
 		cboEmployeeRole.setBounds(150, 140, 200, 40);
 		cboEmployeeRole.setSelectedItem(nhanVien.getVaiTro());
 
@@ -161,7 +173,7 @@ public class CapNhatNhanVien extends JFrame {
 		}
 	}
 
-	private void updateEmployee(NhanVien nhanVien) {
+	private void updateEmployee(NhanVien nhanVien) throws MalformedURLException, NotBoundException, RemoteException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		String fullName = txtFullName.getText();
@@ -183,7 +195,7 @@ public class CapNhatNhanVien extends JFrame {
 		nhanVien.setNgaySinh(LocalDate.parse(birthDateStr));
 		nhanVien.setNgayBatDauLam(LocalDate.parse(startDateStr));
 
-		NhanVienDAO dao = new NhanVienDAO(NhanVien.class);
+		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
 		if (dao.update(nhanVien)) {
 			JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
 			dispose(); // Close the dialog
@@ -199,10 +211,10 @@ public class CapNhatNhanVien extends JFrame {
 
 	private boolean validateInputs(String fullName, String email, String phone, String birthDateStr,
 			String startDateStr) {
-		if (!Pattern.matches("^[\\p{L} ]+$", fullName)) {
-			JOptionPane.showMessageDialog(this, "Tên không hợp lệ!");
-			return false;
-		}
+//		if (!Pattern.matches("^[\\p{L} ]+$", fullName)) {
+//			JOptionPane.showMessageDialog(this, "Tên không hợp lệ!");
+//			return false;
+//		}
 
 		if (!Pattern.matches("^[A-Za-z0-9+_.-]+@(.+)$", email)) {
 			JOptionPane.showMessageDialog(this, "Email không hợp lệ!");

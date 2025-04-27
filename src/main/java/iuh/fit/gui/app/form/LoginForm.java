@@ -12,6 +12,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -56,7 +59,7 @@ public class LoginForm extends BlurBackground {
 	private JWindow splashScreen;
 	 private static LoginForm instance; // Để đảm bảo chỉ có một phiên bản
 
-	public LoginForm() {
+	public LoginForm() throws MalformedURLException, NotBoundException, RemoteException {
 		ctrlLoginForm = new CtrlLoginForm();
 //		ImageIcon imageIcon = new ImageIcon("images/background.jpg");
 //		setOverlay(new StyleOverlay(new Color(20, 20, 20), 0.1f));
@@ -66,7 +69,7 @@ public class LoginForm extends BlurBackground {
 		addEvents();
 	}
 	
-	 public static LoginForm getInstance() {
+	 public static LoginForm getInstance() throws MalformedURLException, NotBoundException, RemoteException {
 	        if (instance == null) {
 	            instance = new LoginForm();
 	        }
@@ -158,8 +161,13 @@ public class LoginForm extends BlurBackground {
 		cmdLogin.addActionListener(e -> {
 			String username = txtUser.getText().trim();
 			String password = new String(txtPass.getPassword());
-			NhanVien employee = ctrlLoginForm.getEmployeeByAccount(username, password);
-			Main app = Main.getInstance();
+            NhanVien employee = null;
+            try {
+                employee = ctrlLoginForm.getEmployeeByAccount(username, password);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+            Main app = Main.getInstance();
 
 			if (employee == null) {
 				JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu");

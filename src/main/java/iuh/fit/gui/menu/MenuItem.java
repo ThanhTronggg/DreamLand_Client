@@ -13,7 +13,12 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Path2D;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -38,6 +43,35 @@ public class MenuItem extends JPanel {
 	private boolean menuShow;
 	private float animate;
 	private PopupSubmenu popup;
+
+	private static final Map<String, String> ICON_MAPPING = new HashMap<>();
+	static {
+		// Quản lý (từ QUAN_LY_MENU_ITEMS)
+		ICON_MAPPING.put("Quản lý Nhân viên", "quanlynhanvien");
+		ICON_MAPPING.put("Quản lý Khuyến mãi", "quanlykhuyenmai");
+		ICON_MAPPING.put("Quản lý Phim", "quanlyphim");
+		ICON_MAPPING.put("Đồ ăn & uống", "doanuong");
+		ICON_MAPPING.put("Quản lý Đồ ăn & uống", "quanlydoanuong");
+		ICON_MAPPING.put("Quản lý Đồ ăn & uống_Đồ ăn", "quanlydoanuong_doan");
+		ICON_MAPPING.put("Quản lý Đồ ăn & uống_Nước uống", "quanlydoanuong_nuocuong");
+
+		// Quản lý (từ NHAN_VIEN_MENU_ITEMS)
+		ICON_MAPPING.put("Quản lý Lịch chiếu", "quanlylichchieu");
+		ICON_MAPPING.put("Quản lý Khách hàng", "quanlykhachhang");
+
+		// Thống kê (chung cho cả hai)
+		ICON_MAPPING.put("Thống kê", "thongke");
+		ICON_MAPPING.put("Thống kê_Doanh thu", "thongke_doanhthu");
+		ICON_MAPPING.put("Thống kê_Khách hàng", "thongke_khachhang");
+		ICON_MAPPING.put("Thống kê_Phim", "thongke_phim");
+		ICON_MAPPING.put("Thống kê_Đồ ăn & uống", "thongke_doanuong");
+
+		// Hồ sơ và Đăng xuất (chung cho cả hai)
+		ICON_MAPPING.put("Hồ sơ", "hoso");
+		ICON_MAPPING.put("Hồ sơ_Thông tin người dùng", "hoso_thongtinnguoidung");
+		ICON_MAPPING.put("Hồ sơ_Đổi mật khẩu", "hoso_doimatkhau");
+		ICON_MAPPING.put("Đăng xuất", "dangxuat");
+	}
 
 	public MenuItem(Menu menu, String menus[], int menuIndex, List<MenuEvent> events, String role, String special) {
 		this.menu = menu;
@@ -71,28 +105,28 @@ public class MenuItem extends JPanel {
 		return menuIndex;
 	}
 
-	private Icon getIcon(String role) {
-		if (role.equalsIgnoreCase("Employee") && menuIndex >= 2) {
-			menuIndex++;
-		}
+	private Icon getIcon(String menuName) {
+		String iconName = ICON_MAPPING.getOrDefault(menuName, "default");
 		Color lightColor = FlatUIUtils.getUIColor("Menu.icon.lightColor", Color.red);
 		Color darkColor = FlatUIUtils.getUIColor("Menu.icon.darkColor", Color.red);
-		FlatSVGIcon icon = new FlatSVGIcon("icon/" + menuIndex + ".svg", 22, 20);
+		FlatSVGIcon icon = new FlatSVGIcon("icon/" + iconName + ".svg", 25, 25);
 		FlatSVGIcon.ColorFilter f = new FlatSVGIcon.ColorFilter();
 		f.add(Color.decode("#000000"), lightColor, darkColor);
 		icon.setColorFilter(f);
 		return icon;
 	}
-	
-	private Icon getSubMenuIcon(int subIndex, String special) {
-	    Color lightColor = FlatUIUtils.getUIColor("Menu.icon.lightColor", Color.red);
-	    Color darkColor = FlatUIUtils.getUIColor("Menu.icon.darkColor", Color.red);
-	    FlatSVGIcon icon = new FlatSVGIcon("icon/" + special + subIndex + ".svg", 20, 20);
-//	    System.out.println("icon/" + special + subIndex + ".svg");
-	    FlatSVGIcon.ColorFilter f = new FlatSVGIcon.ColorFilter();
-	    f.add(Color.decode("#000000"), lightColor, darkColor);
-	    icon.setColorFilter(f);
-	    return icon;
+
+	private Icon getSubMenuIcon(int subIndex, String menuName) {
+		String key = menuName + "_" + menus[subIndex];
+		System.out.println(key);
+		String iconName = ICON_MAPPING.getOrDefault(key, "default");
+		Color lightColor = FlatUIUtils.getUIColor("Menu.icon.lightColor", Color.red);
+		Color darkColor = FlatUIUtils.getUIColor("Menu.icon.darkColor", Color.red);
+		FlatSVGIcon icon = new FlatSVGIcon("icon/" + iconName + ".svg", 25, 25);
+		FlatSVGIcon.ColorFilter f = new FlatSVGIcon.ColorFilter();
+		f.add(Color.decode("#000000"), lightColor, darkColor);
+		icon.setColorFilter(f);
+		return icon;
 	}
 
 	private void init(String role, String special) {
@@ -104,7 +138,7 @@ public class MenuItem extends JPanel {
 			menuItem.setHorizontalAlignment(
 					menuItem.getComponentOrientation().isLeftToRight() ? JButton.LEADING : JButton.TRAILING);
 			if (i == 0) {
-				menuItem.setIcon(getIcon(role));
+				menuItem.setIcon(getIcon(menus[0]));
 				menuItem.addActionListener((ActionEvent e) -> {
 					if (menus.length > 1) {
 						if (menu.isMenuFull()) {
@@ -114,15 +148,31 @@ public class MenuItem extends JPanel {
 									UIScale.scale(menuItemHeight) / 2);
 						}
 					} else {
-						menu.runEvent(menuIndex, 0);
-					}
+                        try {
+                            menu.runEvent(menuIndex, 0);
+                        } catch (MalformedURLException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (NotBoundException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
 				});
 			} else {
 				final int subIndex = i;
-				menuItem.setIcon(getSubMenuIcon(subIndex, special));
+				menuItem.setIcon(getSubMenuIcon(subIndex, menus[0]));
 				menuItem.addActionListener((ActionEvent e) -> {
-					menu.runEvent(menuIndex, subIndex);
-				});
+                    try {
+                        menu.runEvent(menuIndex, subIndex);
+                    } catch (MalformedURLException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (NotBoundException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
 			}
 			add(menuItem);
 		}

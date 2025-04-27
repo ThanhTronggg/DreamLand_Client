@@ -48,7 +48,7 @@ public class TaoHoaDon {
 
     private static Font getFont(float size, int style) {
         try {
-            String fontPath = "gui/resources/fonts/Roboto-Regular.ttf";
+            String fontPath = "fonts/Roboto-Regular.ttf";
             com.itextpdf.text.pdf.BaseFont baseFont = com.itextpdf.text.pdf.BaseFont.createFont(fontPath, com.itextpdf.text.pdf.BaseFont.IDENTITY_H, com.itextpdf.text.pdf.BaseFont.EMBEDDED);
             return new Font(baseFont, size, style);
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class TaoHoaDon {
     }
 
     public static void taoHD(ArrayList<ChiTietHoaDon> odList, ArrayList<Ve> danhSachGhe, HoaDon hd) {
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("#,##0.00");
         String defaultFolderPath = "data/";
         String fileName = hd.getMaHoaDon() + "_ticket.pdf";
 
@@ -97,7 +97,7 @@ public class TaoHoaDon {
             document.add(new Paragraph("Phim: " + danhSachGhe.get(0).getLichChieu().getPhim().getTenPhim() + "\n", getFont(12, Font.NORMAL)));
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.ENGLISH);
             document.add(new Paragraph("Thời gian: " + danhSachGhe.get(0).getLichChieu().getGioBatDau().format(dateFormatter) + "\n", getFont(12, Font.NORMAL)));
-            document.add(new Paragraph("Phòng: " + danhSachGhe.get(0).getLichChieu().getPhong() + "\n", getFont(12, Font.NORMAL)));
+            document.add(new Paragraph("Phòng: " + danhSachGhe.get(0).getLichChieu().getPhong().getTenPhong() + "\n", getFont(12, Font.NORMAL)));
 
             document.add(new Paragraph("===========================================================\n", getFont(10, Font.NORMAL)));
             //Bảng ghế
@@ -119,7 +119,7 @@ public class TaoHoaDon {
             		giaVe = ghe.getLichChieu().getGiaMotGhe();
             	}
             	tongTienVe += giaVe;
-            	bangGhe.addCell(createCell(Double.toString(giaVe), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
+            	bangGhe.addCell(createCell(df.format(giaVe), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
             }
             
             document.add(bangGhe);
@@ -151,16 +151,16 @@ public class TaoHoaDon {
             bangThanhToan.addCell(createCell("Thành tiền", getFont(12, Font.BOLD), Element.ALIGN_RIGHT));
             
             bangThanhToan.addCell(createCell("Tổng tiền vé ", getFont(12, Font.NORMAL), Element.ALIGN_LEFT));
-            bangThanhToan.addCell(createCell(Double.toString(tongTienVe), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
+            bangThanhToan.addCell(createCell(df.format(tongTienVe), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
             
             bangThanhToan.addCell(createCell("Tổng tiền đồ ăn & uống ", getFont(12, Font.NORMAL), Element.ALIGN_LEFT));
-            bangThanhToan.addCell(createCell(Double.toString(tongTienSP), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
+            bangThanhToan.addCell(createCell(df.format(tongTienSP), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
             
             bangThanhToan.addCell(createCell("VAT ", getFont(12, Font.NORMAL), Element.ALIGN_LEFT));
-            bangThanhToan.addCell(createCell(Double.toString((tongTienVe + tongTienSP)*hd.getVAT()), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
+            bangThanhToan.addCell(createCell(df.format((tongTienVe + tongTienSP)*hd.getVAT()), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
             
             bangThanhToan.addCell(createCell("Khuyến mãi ", getFont(12, Font.NORMAL), Element.ALIGN_LEFT));        
-            bangThanhToan.addCell(createCell("- "+Double.toString((tongTienVe + tongTienSP)*hd.getKhuyenMai().getPhanTramKhuyenMai()), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
+            bangThanhToan.addCell(createCell("- "+df.format((tongTienVe + tongTienSP)*hd.getKhuyenMai().getPhanTramKhuyenMai()), getFont(12, Font.NORMAL), Element.ALIGN_RIGHT));
             document.add(bangThanhToan);
             document.add(new Paragraph("===========================================================\n", getFont(10, Font.NORMAL)));
 

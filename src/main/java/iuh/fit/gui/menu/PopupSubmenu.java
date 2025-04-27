@@ -13,6 +13,9 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Path2D;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -50,8 +53,16 @@ public class PopupSubmenu extends JPanel {
 			JButton button = createButtonItem(menus[i]);
 			final int subIndex = i;
 			button.addActionListener((ActionEvent e) -> {
-				menu.runEvent(menuIndex, subIndex);
-				popup.setVisible(false);
+                try {
+                    menu.runEvent(menuIndex, subIndex);
+                } catch (MalformedURLException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+                popup.setVisible(false);
 			});
 			add(button);
 		}

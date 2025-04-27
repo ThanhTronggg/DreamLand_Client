@@ -33,7 +33,6 @@ public class XemThongTinNhanVien extends JDialog {
         addLabel(mainPanel, "Ngày Sinh:", nhanVien.getNgaySinh().toString());
         addLabel(mainPanel, "SĐT:", nhanVien.getSoDienThoai());
         addLabel(mainPanel, "Email:", nhanVien.getEmail());
-        addLabel(mainPanel, "Lương:", String.format("%.2f", nhanVien.getLuong()));
         addLabel(mainPanel, "Ngày Bắt Đầu Làm:", nhanVien.getNgayBatDauLam().toString());
         addLabel(mainPanel, "Vai Trò:", nhanVien.getVaiTro());
         addLabel(mainPanel, "Trạng Thái:", nhanVien.getTrangThai());

@@ -4,6 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,10 +27,12 @@ import entity.Phong;
 import dao.LichChieuDAO;
 import dao.PhimDAO;
 import dao.PhongDAO;
+import service.*;
 
 public class ThemLichChieuDialog extends JDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
+    private final IdGeneratorService idGeneratorService;
     private JTextField txtMaLichChieu;
     private JTextField txtMaPhong;
     private JTextField txtMaPhim;
@@ -35,13 +41,13 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
     private JTextField txtGiaMotGhe;
     private JButton btnThem;
     private JButton btnHuy;
-    private LichChieuDAO lichChieuDAO;
+    private LichChieuService lichChieuDAO;
     private boolean dataChanged;
 	private JComboBox<Phong> cboPhong;
 	private JComboBox<Phim> cboPhim;
-	private PhongDAO daoPhong;
+	private PhongService daoPhong;
 	private ArrayList<Phong> dsPhong;
-	private PhimDAO daoPhim;
+	private PhimService daoPhim;
 	private ArrayList<Phim> dsPhim;
 	private TimePicker chonGio;
 	private JButton nutChonGio;
@@ -49,12 +55,13 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
 	private DateChooser chonNgayBD;
 	private JTextField txtNgayBD;
 
-    public ThemLichChieuDialog(JFrame parent) {
+    public ThemLichChieuDialog(JFrame parent) throws MalformedURLException, NotBoundException, RemoteException {
         super(parent, "Thêm Lịch Chiếu", true);
-        this.lichChieuDAO = new LichChieuDAO(LichChieu.class);
+        this.lichChieuDAO = (LichChieuService) Naming.lookup("rmi://XXXXXX:9090/lichChieuService");
         this.dataChanged = false;
-        daoPhong = new PhongDAO(Phong.class);
-        daoPhim = new PhimDAO(Phim.class);
+        daoPhong = (PhongService) Naming.lookup("rmi://XXXXXX:9090/phongService");
+        daoPhim = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://XXXXXX:9090/idGeneratorService");
 
         setSize(600, 350);
         setLocationRelativeTo(parent);
@@ -75,7 +82,7 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
         cboPhim = new JComboBox<Phim>();
         dsPhim = (ArrayList<Phim>) daoPhim.getAll();
         for (Phim phim : dsPhim) {
-        	if (phim.getTrangThai().equals("Đã phát hành")) {
+        	if (phim.getTrangThai().equals("Đang chiếu")) {
         		cboPhim.addItem(phim);
         	}
         }
@@ -149,7 +156,12 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source.equals(btnThem)) {
-            themLichChieu();
+            try {
+                themLichChieu();
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
         } else if (source.equals(btnHuy)) {
             UIManager.put("OptionPane.yesButtonText", "Có");
             UIManager.put("OptionPane.noButtonText", "Không");
@@ -164,7 +176,7 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
         }
     }
 
-    private void themLichChieu() {
+    private void themLichChieu() throws RemoteException {
         String ngayBD = txtNgayBD.getText().trim();
         String gioBD = txtGioBatDau.getText().trim();
         String giaMotGheStr = txtGiaMotGhe.getText().trim();
@@ -264,6 +276,7 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
         }
 
         LichChieu lichChieuMoi = new LichChieu(ngayGioChieu, ngayGioKetThuc, giaMotGhe, phong, phim);
+        lichChieuMoi.setMaLichChieu(idGeneratorService.getNextId("LichChieu"));
         boolean themThanhCong = lichChieuDAO.add(lichChieuMoi);
         if (themThanhCong) {
         	UIManager.put("Button.background", Color.decode("#273167"));

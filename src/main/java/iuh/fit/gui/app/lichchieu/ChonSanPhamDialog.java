@@ -18,6 +18,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -43,6 +47,8 @@ import entity.LichChieu;
 import entity.NhanVien;
 import entity.SanPham;
 import entity.Ve;
+import service.SanPhamService;
+import service.VeService;
 
 /**
  * @description:
@@ -58,17 +64,17 @@ public class ChonSanPhamDialog extends JDialog implements ActionListener {
     private JButton btnTatCa, btnDoAn, btnThucUong, btnXoaTatCa, btnTiepTuc;
     private JLabel lblThanhToan, lblTongTien, lblGiaTriTongTien;
     private ArrayList<ChiTietHoaDon> danhSachChiTietDatHang;
-    private SanPhamDAO sanPhamDAO;
+    private SanPhamService sanPhamDAO;
     private boolean sanPhamDaTonTai;
     private NhanVien nhanVienHienTai;
     private ChonGheDialog chonGheDialog;
     private String kieuNhomButton, kieuButtonBinhThuong;
 	private GridBagConstraints gbc;
 
-	public ChonSanPhamDialog(ArrayList<Ghe> danhSachGheDaChon, LichChieu lichChieu) {
+	public ChonSanPhamDialog(ArrayList<Ghe> danhSachGheDaChon, LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
 
         danhSachChiTietDatHang = new ArrayList<ChiTietHoaDon>();
-        sanPhamDAO = new SanPhamDAO(SanPham.class);
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
         
         pnlChinh = new JPanel(new BorderLayout());
         
@@ -97,7 +103,7 @@ public class ChonSanPhamDialog extends JDialog implements ActionListener {
         });
     }
 
-    private void taoPanelTrai() {
+    private void taoPanelTrai() throws RemoteException {
         pnlTrai = new JPanel(new BorderLayout());
         pnlTrai.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, Color.gray));
 
@@ -293,7 +299,16 @@ public class ChonSanPhamDialog extends JDialog implements ActionListener {
 
     private void moCuaSoThanhToan(ArrayList<Ghe> danhSachGheDaChon, LichChieu lichChieu) {
         new Thread(() -> {
-            ThanhToanDialog checkoutDialog = new ThanhToanDialog(danhSachGheDaChon, danhSachChiTietDatHang, lichChieu);
+            ThanhToanDialog checkoutDialog = null;
+            try {
+                checkoutDialog = new ThanhToanDialog(danhSachGheDaChon, danhSachChiTietDatHang, lichChieu);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (NotBoundException e) {
+                throw new RuntimeException(e);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
             checkoutDialog.setNhanVienHienTai(nhanVienHienTai);
 //            System.out.println(nhanVienHienTai);
             checkoutDialog.setChonSanPhamDialog(this);
@@ -318,11 +333,23 @@ public class ChonSanPhamDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         ArrayList<SanPham> sanPhamList;
         if (e.getSource() == btnTatCa) {
-            sanPhamList = (ArrayList<SanPham>) sanPhamDAO.getAll();
+            try {
+                sanPhamList = (ArrayList<SanPham>) sanPhamDAO.getAll();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         } else if (e.getSource() == btnDoAn) {
-            sanPhamList = sanPhamDAO.getSanPhamTheoLoaiSP("Thức ăn");
+            try {
+                sanPhamList = sanPhamDAO.getSanPhamTheoLoaiSP("Thức ăn");
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         } else {
-            sanPhamList = sanPhamDAO.getSanPhamTheoLoaiSP("Nước uống");
+            try {
+                sanPhamList = sanPhamDAO.getSanPhamTheoLoaiSP("Nước uống");
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         hienThiSanPham(sanPhamList);
     }

@@ -3,11 +3,14 @@ package iuh.fit.gui.app.khachhang;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.*;
-import dao.KhachHangDAO;
 import entity.KhachHang;
+import service.KhachHangService;
 
 public class SuaThongTinKhachHangDialog extends JDialog implements ActionListener {
     
@@ -17,12 +20,12 @@ public class SuaThongTinKhachHangDialog extends JDialog implements ActionListene
     private JTextField txtEmail;
     private JButton btnThoat;
     private JButton btnSua;
-    private KhachHangDAO khachHangDao;
+    private KhachHangService khachHangDao;
     private KhachHang khachHang;
 
-    public SuaThongTinKhachHangDialog(KhachHang khachHang) {
+    public SuaThongTinKhachHangDialog(KhachHang khachHang) throws MalformedURLException, NotBoundException, RemoteException {
         this.khachHang = khachHang;
-        khachHangDao = new KhachHangDAO(KhachHang.class); // Đảm bảo đối tượng KhachHangDAO được khởi tạo trước khi gọi loadKhachHangData
+        khachHangDao = (KhachHangService) Naming.lookup("rmi://XXXXXX:9090/khachHangService");
         // Frame settings
         setSize(700, 500);
         setTitle("Sửa thông tin khách hàng");
@@ -102,7 +105,7 @@ public class SuaThongTinKhachHangDialog extends JDialog implements ActionListene
 					} else {
 					    JOptionPane.showMessageDialog(this, "Cập nhật thất bại! Vui lòng thử lại.");
 					}
-				} catch (HeadlessException e1) {
+				} catch (HeadlessException | RemoteException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

@@ -5,6 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,9 +20,9 @@ import javax.swing.table.DefaultTableModel;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-import dao.PhimDAO;
 import entity.Phim;
 import net.miginfocom.swing.MigLayout;
+import service.PhimService;
 
 public class QuanLyPhimGUI extends JPanel implements ActionListener{
 
@@ -31,10 +35,10 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
     private JTable table;
     private JComboBox<String> cboLoaiHienThi;
     private JButton btnXoa;
-    private PhimDAO phim_dao;
+    private PhimService phim_dao;
 
-    public QuanLyPhimGUI() {
-        phim_dao = new PhimDAO(Phim.class);
+    public QuanLyPhimGUI() throws MalformedURLException, NotBoundException, RemoteException {
+        phim_dao = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
        
 
         setLayout(new BorderLayout());
@@ -79,7 +83,12 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
                     String maPhim = (String) tableModel.getValueAt(selectedRow, 0);
                     
                     // Retrieve the movie details from the DAO
-                    Phim selectedPhim = phim_dao.findById(maPhim);
+                    Phim selectedPhim = null;
+                    try {
+                        selectedPhim = phim_dao.findById(maPhim);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
 
                     // Show the movie details in a dialog
                     ChiTietPhimDialog dialog = new ChiTietPhimDialog(selectedPhim);
@@ -134,11 +143,29 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
         // Lọc khi nhập tìm kiếm
         txtTim.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void removeUpdate(DocumentEvent e) { hienThi(); }
+            public void removeUpdate(DocumentEvent e) {
+                try {
+                    hienThi();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             @Override
-            public void insertUpdate(DocumentEvent e) { hienThi(); }
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    hienThi();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             @Override
-            public void changedUpdate(DocumentEvent e) { hienThi(); }
+            public void changedUpdate(DocumentEvent e) {
+                try {
+                    hienThi();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         });
    
 
@@ -148,22 +175,42 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
         if (o.equals(cboLoaiHienThi)) {
-            hienThi();
+            try {
+                hienThi();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         } else if (o.equals(btnThem)) {
-            them();
+            try {
+                them();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            }
         } else if (o.equals(btnSua)) {
-            sua();
+            try {
+                sua();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         } else if (o.equals(btnXoa)) {
-           xoa();
+            try {
+                xoa();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
-    private void hienThi() {
+    private void hienThi() throws RemoteException {
         String selectedOption = cboLoaiHienThi.getSelectedItem().toString(); // Lấy lựa chọn từ ComboBox
         docData(selectedOption); // Gọi docData với tham số là trạng thái chọn
     }
 
-    public void docData(String option) {
+    public void docData(String option) throws RemoteException {
         String textTimKiem = txtTim.getText();
 
         // Xóa tất cả hàng hiện tại trong bảng
@@ -199,7 +246,7 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
 
 
 
-    private void them() {
+    private void them() throws RemoteException, MalformedURLException, NotBoundException {
         ThemPhimDialog themPhim = new ThemPhimDialog();
         themPhim.setModal(true);
         themPhim.setVisible(true);
@@ -227,7 +274,7 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
     }
     
 
-    private void sua() {
+    private void sua() throws MalformedURLException, NotBoundException, RemoteException {
         // Kiểm tra xem có hàng nào được chọn không
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -268,7 +315,7 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
 
     
     //Xóa_phim 
-    private void xoa() {
+    private void xoa() throws RemoteException {
         // Kiểm tra xem có hàng nào được chọn không
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {

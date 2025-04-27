@@ -7,10 +7,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.toedter.calendar.JDateChooser;
 import dao.PhimDAO;
 import entity.Phim;
+import service.NhanVienService;
+import service.PhimService;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -24,12 +30,12 @@ public class CapNhatPhimDialog extends JDialog implements ActionListener {
     private JButton btnCapNhat, btnThoat, btnChonAnh;
     private JLabel lblHinhChon;
     private String pathAnh;
-    private PhimDAO phimDao;
+    private PhimService phimDao;
     private Phim phim;
 
-    public CapNhatPhimDialog(Phim phim) {
+    public CapNhatPhimDialog(Phim phim) throws MalformedURLException, NotBoundException, RemoteException {
         
-        this.phimDao = new PhimDAO(Phim.class); // Khởi tạo phimDao
+        this.phimDao = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
         setTitle("Cập Nhật Phim");
         setSize(980, 760);
         setResizable(false);

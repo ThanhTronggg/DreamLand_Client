@@ -7,14 +7,20 @@ import java.awt.event.*;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import dao.SanPhamDAO;
 import entity.SanPham;
+import service.IdGeneratorService;
+import service.SanPhamService;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.ArrayList;
 
 public class QuanLyNuocUongGUI extends JPanel {
+    private final IdGeneratorService idGeneratorService;
     private JTextField searchField;
     private JPanel productsPanel;
     private Color primaryColor = new Color(70, 130, 180);
@@ -23,15 +29,16 @@ public class QuanLyNuocUongGUI extends JPanel {
     private Font normalFont = new Font("Arial", Font.PLAIN, 14);
     private NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private ArrayList<SanPham> danhSachSanPham;
-	private SanPhamDAO sanPhamDAO;
+	private SanPhamService sanPhamDAO;
 	private String pathAnh;
 
-    public QuanLyNuocUongGUI() {
+    public QuanLyNuocUongGUI() throws MalformedURLException, NotBoundException, RemoteException {
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(20, 20, 20, 20));
         setBackground(Color.WHITE);
 
-        sanPhamDAO = new SanPhamDAO(SanPham.class);
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://XXXXXX:9090/idGeneratorService");
         
         danhSachSanPham = null; 
 
@@ -125,7 +132,13 @@ public class QuanLyNuocUongGUI extends JPanel {
         buttonsPanel.setBackground(Color.WHITE);
 
         JButton deleteButton = createStyledButton("Xóa", new Color(220, 53, 69));
-        deleteButton.addActionListener(e -> showDeleteConfirmDialog(sanPham));
+        deleteButton.addActionListener(e -> {
+            try {
+                showDeleteConfirmDialog(sanPham);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         buttonsPanel.add(deleteButton);
 
         JButton updateButton = createStyledButton("Cập nhật", new Color(40, 167, 69));
@@ -211,6 +224,7 @@ public class QuanLyNuocUongGUI extends JPanel {
                 newProduct.setGiaMua(giaMua);
                 newProduct.setLoaiSanPham(loaiSP);
                 newProduct.dinhGiaBan();
+                newProduct.setMaSanPham(idGeneratorService.getNextId("SanPham"));
                 danhSachSanPham.add(newProduct);
                 refreshProductsPanel();
                 if(sanPhamDAO.add(newProduct)) {
@@ -222,7 +236,9 @@ public class QuanLyNuocUongGUI extends JPanel {
                 }
             } catch (NumberFormatException ex) {                                                                                                 
                 JOptionPane.showMessageDialog(dialog, "Vui lòng nhập đúng định dạng cho số lượng và giá!", "Lỗi", JOptionPane.ERROR_MESSAGE);    
-            }                                                                                                                                    
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         });                                                                                                                                      
                                                                                                                                                  
         JButton cancelButton = createStyledButton("Hủy", secondaryColor);                                                                        
@@ -238,7 +254,7 @@ public class QuanLyNuocUongGUI extends JPanel {
         dialog.setVisible(true);                                                                                                                 
     }            
 
-    private void showDeleteConfirmDialog(SanPham sanPham) {                                                                                      
+    private void showDeleteConfirmDialog(SanPham sanPham) throws RemoteException {
         int option = JOptionPane.showConfirmDialog(this,                                                                                         
                 "Bạn có chắc chắn muốn xóa sản phẩm " + sanPham.getTenSanPham() + "?",                                                           
                 "Xác nhận xóa",                                                                                                                  
@@ -302,7 +318,9 @@ public class QuanLyNuocUongGUI extends JPanel {
             } catch (NumberFormatException ex) {     
             	ex.printStackTrace();
                 JOptionPane.showMessageDialog(dialog, "Vui lòng nhập đúng định dạng cho số lượng và giá!", "Lỗi", JOptionPane.ERROR_MESSAGE);    
-            }                                                                                                                                    
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         });                                                                                                                                      
                                                                                                                                                  
         JButton cancelButton = createStyledButton("Hủy", secondaryColor);                                                                        
@@ -356,7 +374,9 @@ public class QuanLyNuocUongGUI extends JPanel {
                     "Vui lòng nhập số lượng hợp lệ.",                                                                                            
                     "Lỗi",                                                                                                                       
                     JOptionPane.ERROR_MESSAGE);                                                                                                  
-            }                                                                                                                                    
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         });                                                                                                                                      
                                                                                                                                                  
         JButton cancelButton = createStyledButton("Hủy", secondaryColor);                                                                        
@@ -434,7 +454,15 @@ public class QuanLyNuocUongGUI extends JPanel {
             JFrame frame = new JFrame("Quản Lý Đồ Ăn");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1000, 700);
-            frame.setContentPane(new QuanLyNuocUongGUI());
+            try {
+                frame.setContentPane(new QuanLyNuocUongGUI());
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (NotBoundException e) {
+                throw new RuntimeException(e);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });

@@ -2,19 +2,25 @@ package iuh.fit.gui.other;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import dao.TaiKhoanDAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
+import service.KhachHangThongKeService;
+import service.TaiKhoanService;
+
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 public class CtrlLoginForm {
 
-	private TaiKhoanDAO tkDAO;
+	private TaiKhoanService tkDAO;
 
-	public CtrlLoginForm() {
-		tkDAO = new TaiKhoanDAO(TaiKhoan.class);
+	public CtrlLoginForm() throws MalformedURLException, NotBoundException, RemoteException {
+		tkDAO = (TaiKhoanService) Naming.lookup("rmi://XXXXXX:9090/taiKhoanService");
 	}
 
-	public boolean checkCredentials(String username, String password) {
+	public boolean checkCredentials(String username, String password) throws RemoteException {
 		TaiKhoan tk = tkDAO.getTaiKhoanTheoUsername(username);
 		if (tk == null || !BCrypt.checkpw(password, tk.getMatKhau())) {
 			return false;
@@ -22,7 +28,7 @@ public class CtrlLoginForm {
 		return true;
 	}
 
-	public NhanVien getEmployeeByAccount(String username, String password) {
+	public NhanVien getEmployeeByAccount(String username, String password) throws RemoteException {
 		return tkDAO.getNhanVienTheoTaiKhoan(username, checkCredentials(username, password));
 	}
 

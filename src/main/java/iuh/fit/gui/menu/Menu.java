@@ -9,6 +9,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,10 +41,29 @@ public class Menu extends JPanel implements MouseListener{
 	protected final int menuMaxWidth = 260;
 	protected final int menuMinWidth = 60;
 	protected final int headerFullHgap = 5;
-	private final String menuItems[][] = { { "~Quản lý~" }, { "Phim" }, { "Lịch chiếu" },
-			{ "Nhân viên" }, { "Khách hàng" }, { "Đồ ăn & uống", "Đồ ăn", "Nước uống" }, {"Khuyến mãi"},
-			{ "~Khác~" }, { "Thống kê", "Doanh thu", "Khách hàng", "Phim", "Đồ ăn & uống"},
-			{ "Hồ sơ", "Thông tin người dùng", "Đổi mật khẩu" }, { "Đăng xuất" } };
+
+	private static final String[][] QUAN_LY_MENU_ITEMS = {
+			{"~Quản lý~"},
+			{"Quản lý Nhân viên"},
+			{"Quản lý Khuyến mãi"},
+			{"Quản lý Phim"},
+			{"~Đồ ăn & uống~"},
+			{"Quản lý Đồ ăn & uống", "Đồ ăn", "Nước uống" },
+			{"~Thống kê~"},
+			{"Thống kê", "Doanh thu", "Khách hàng", "Phim", "Đồ ăn & uống"},
+			{"Hồ sơ", "Thông tin người dùng", "Đổi mật khẩu" },
+			{"Đăng xuất"}
+	};
+
+	private static final String[][] NHAN_VIEN_MENU_ITEMS = {
+			{"~Quản lý~"},
+			{"Quản lý Lịch chiếu"},
+			{"Quản lý Khách hàng"},
+			{"~Thống kê~"},
+			{"Thống kê", "Doanh thu", "Khách hàng", "Phim", "Đồ ăn & uống"},
+			{"Hồ sơ", "Thông tin người dùng", "Đổi mật khẩu"},
+			{"Đăng xuất"}
+	};
 	private JLabel header;
 	private JScrollPane scroll;
 	private JPanel panelMenu;
@@ -120,6 +142,7 @@ public class Menu extends JPanel implements MouseListener{
 	}
 
 	private void createMenu(String role) {
+		String[][] menuItems = role.equalsIgnoreCase("Nhân viên quản lý") ? QUAN_LY_MENU_ITEMS : NHAN_VIEN_MENU_ITEMS;
 		int index = 0;
 		for (int i = 0; i < menuItems.length; i++) {
 			String menuName = menuItems[i][0];
@@ -132,7 +155,7 @@ public class Menu extends JPanel implements MouseListener{
 				if (menuItems[i].length > 1) {
 					special = "A";
 					count++;
-					special += Integer.toString(count);					
+					special += Integer.toString(count);
 				}
 				MenuItem menuItem = new MenuItem(this, menuItems[i], index++, events, role, special);
 				panelMenu.add(menuItem);
@@ -149,7 +172,7 @@ public class Menu extends JPanel implements MouseListener{
 		return lbTitle;
 	}
 
-	public void setSelectedMenu(int index, int subIndex) {
+	public void setSelectedMenu(int index, int subIndex) throws MalformedURLException, NotBoundException, RemoteException {
 		runEvent(index, subIndex);
 	}
 
@@ -168,7 +191,7 @@ public class Menu extends JPanel implements MouseListener{
 		}
 	}
 
-	protected void runEvent(int index, int subIndex) {
+	protected void runEvent(int index, int subIndex) throws MalformedURLException, NotBoundException, RemoteException {
 		MenuAction menuAction = new MenuAction();
 		for (MenuEvent event : events) {
 			event.menuSelected(index, subIndex, menuAction);

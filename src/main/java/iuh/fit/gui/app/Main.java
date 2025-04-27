@@ -1,6 +1,9 @@
 package iuh.fit.gui.app;
 
 import java.awt.*;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.time.LocalTime;
 
 import javax.swing.*;
@@ -25,7 +28,7 @@ public class Main extends JFrame {
 	private final LoginForm loginForm;
 	private MainForm mainForm;
 
-	private Main() {
+	private Main() throws MalformedURLException, NotBoundException, RemoteException {
 		initComponents();
 		loginForm = new LoginForm();
 		setContentPane(loginForm);
@@ -55,7 +58,7 @@ public class Main extends JFrame {
 		app.mainForm.showForm(component);
 	}
 
-	public static void setSelectedMenu(int index, int subIndex) {
+	public static void setSelectedMenu(int index, int subIndex) throws MalformedURLException, NotBoundException, RemoteException {
 		app.mainForm.setSelectedMenu(index, subIndex);
 	}
 
@@ -95,18 +98,28 @@ public class Main extends JFrame {
 //		SwingUtilities.invokeLater(() -> new Main().setVisible(true));
 		SwingUtilities.invokeLater(() -> {
 	        // Tạo instance của Main
-	        Main mainApp = new Main();
-	        mainApp.setVisible(false); // Không hiển thị JFrame chính ngay lúc đầu
+            Main mainApp = null;
+            try {
+                mainApp = new Main();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            mainApp.setVisible(false); // Không hiển thị JFrame chính ngay lúc đầu
 
 	        // Hiển thị màn hình splash thông qua LoginForm
-			LoginForm.getInstance().showSplashScreen(() -> {
-				// Khi splash kết thúc, hiển thị JFrame chính
-	            mainApp.setVisible(true);
-	            mainApp.setContentPane(mainApp.getLoginForm());
-	            mainApp.revalidate();
-	            mainApp.repaint();
-	        });
-	    });
+            try {
+				Main finalMainApp = mainApp;
+				LoginForm.getInstance().showSplashScreen(() -> {
+                    // Khi splash kết thúc, hiển thị JFrame chính
+				finalMainApp.setVisible(true);
+				finalMainApp.setContentPane(finalMainApp.getLoginForm());
+				finalMainApp.revalidate();
+				finalMainApp.repaint();
+				});
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 	}
 
 	private static void showSplashScreen(Runnable onSplashFinished) {

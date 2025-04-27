@@ -3,6 +3,10 @@ package iuh.fit.gui.app.nhanvien;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -23,6 +27,10 @@ import dao.NhanVienDAO;
 import dao.TaiKhoanDAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
+import service.IdGeneratorService;
+import service.LichChieuService;
+import service.NhanVienService;
+import service.TaiKhoanService;
 
 public class ThemNhanVien extends JFrame {
     private JTextField txtFullName, txtEmail, txtPhone;
@@ -76,7 +84,17 @@ public class ThemNhanVien extends JFrame {
         btnSave.setBackground(new Color(70, 130, 180));
         btnSave.setForeground(Color.WHITE);
         btnSave.setFont(new Font("Arial", Font.BOLD, 16));
-        btnSave.addActionListener(this::saveEmployee);
+        btnSave.addActionListener(event -> {
+            try {
+                saveEmployee(event);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (NotBoundException e) {
+                throw new RuntimeException(e);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         // Add panels to the form panel
         formPanel.add(leftPanel);
@@ -109,7 +127,7 @@ public class ThemNhanVien extends JFrame {
         txtPhone = createTextField(150, 90, 200, 40);
 
         // Vai trò combo box
-        cboEmployeeRole = new JComboBox<>(new String[] { "Nhân viên", "Quản lý" });
+        cboEmployeeRole = new JComboBox<>(new String[] { "Nhân viên bán vé", "Nhân viên quản lý" });
         cboEmployeeRole.setBounds(150, 140, 200, 40);
 
         panel.add(createLabel("Email:", 30, 40));
@@ -156,7 +174,7 @@ public class ThemNhanVien extends JFrame {
         formPanel.add(rbtnFemale);
     }
 
-    private void saveEmployee(ActionEvent event) {
+    private void saveEmployee(ActionEvent event) throws MalformedURLException, NotBoundException, RemoteException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String fullName = txtFullName.getText();
@@ -174,20 +192,19 @@ public class ThemNhanVien extends JFrame {
         LocalDate ngaySinh = LocalDate.parse(birthDateStr);
         LocalDate ngayBatDauLam = LocalDate.parse(startDateStr);
 
-        // Tạo tài khoản trước
-        TaiKhoanDAO tkDao = new TaiKhoanDAO(TaiKhoan.class);
-        TaiKhoan tk = new TaiKhoan();
-        tk.setTaiKhoan(phone); // Sử dụng số điện thoại làm tài khoản
-        tk.setMatKhau("12345"); // Mật khẩu mặc định, có thể thay đổi sau
+        TaiKhoanService tkDao = (TaiKhoanService) Naming.lookup("rmi://XXXXXX:9090/taiKhoanService");
+        NhanVienService nvDao = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
+        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://XXXXXX:9090/idGeneratorService");
 
-        boolean isOke = tkDao.add(tk); // Thêm tài khoản vào cơ sở dữ liệu
-        if (!isOke) {
-            JOptionPane.showMessageDialog(this, "Tạo tài khoản thất bại!");
-            return;
-        }
 
-        // Nếu tài khoản tạo thành công, tiếp tục tạo nhân viên
+        // Tạo NhanVien với mã duy nhất
         NhanVien nv = new NhanVien();
+        String maNhanVien;
+        do {
+            maNhanVien = idGeneratorService.getNextId("NhanVien");
+        } while (nvDao.findById(maNhanVien) != null);
+
+        nv.setMaNhanVien(maNhanVien);
         nv.setHoTen(fullName);
         nv.setGioiTinh(gioiTinh);
         nv.setEmail(email);
@@ -195,18 +212,30 @@ public class ThemNhanVien extends JFrame {
         nv.setVaiTro(vaiTro);
         nv.setNgaySinh(ngaySinh);
         nv.setNgayBatDauLam(ngayBatDauLam);
-        TaiKhoan taiKhoan = tkDao.getTaiKhoanTheoUsername(phone);
-        nv.setTaiKhoan(taiKhoan);
+        nv.setTrangThai("Đang làm");
 
-        NhanVienDAO dao = new NhanVienDAO(NhanVien.class);
-        boolean isEmployeeCreated = dao.add(nv); // Thêm nhân viên vào cơ sở dữ liệu
+        // Tạo TaiKhoan
+        TaiKhoan tk = new TaiKhoan();
+        tk.setId(idGeneratorService.getNextId("TaiKhoan"));
+        tk.setTaiKhoan(phone);
+        tk.setMatKhau("12345");
+        tk.setNhanVien(nv);
 
-        if (isEmployeeCreated) {
-            JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công!");
-            clearFields(); // Xóa các trường nhập liệu
-        } else {
-            JOptionPane.showMessageDialog(this, "Thêm nhân viên thất bại!");
+        // Lưu cả hai trong cùng một transaction
+        try {
+//            nvDao.add(nv);
+            tkDao.add(tk);
+            JOptionPane.showMessageDialog(this, "Thêm nhân viên và tài khoản thành công!");
+            System.out.println("TaiKhoan sau khi lưu: " + tk);
+            System.out.println("NhanVien trong TaiKhoan: " + tk.getNhanVien());
+            System.out.println("MatKhau: " + tk.getMatKhau());
+            clearFields();
+        } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm nhân viên hoặc tài khoản: " + e.getMessage());
+            System.err.println("Lỗi khi thêm: " + e.getMessage());
+            e.printStackTrace();
         }
+
     }
 
     private String getDateString(JDateChooser dateChooser, SimpleDateFormat dateFormat) {

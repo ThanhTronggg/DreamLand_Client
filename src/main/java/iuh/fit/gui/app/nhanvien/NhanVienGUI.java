@@ -6,6 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -31,6 +35,8 @@ import dao.TaiKhoanDAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
 import net.miginfocom.swing.MigLayout;
+import service.NhanVienService;
+import service.PhongService;
 
 public class NhanVienGUI extends JPanel implements ActionListener {
 
@@ -42,7 +48,7 @@ public class NhanVienGUI extends JPanel implements ActionListener {
     private JPanel container0;
     private JPanel container1;
 
-    private NhanVienDAO nhanVienDAO;
+    private NhanVienService nhanVienDAO;
     private JButton themMoiButton;
     private NhanVienTableModel nhanVienTableModel;
     private JTable nhanVienTable;
@@ -50,9 +56,9 @@ public class NhanVienGUI extends JPanel implements ActionListener {
     private CapNhatNhanVien capNhatNhanVienDialog;
     private NhanVien nhanVienHienTai;
 
-    public NhanVienGUI(NhanVien nhanVienHienTai) {
+    public NhanVienGUI(NhanVien nhanVienHienTai) throws MalformedURLException, NotBoundException, RemoteException {
         this.nhanVienHienTai = nhanVienHienTai;
-        nhanVienDAO = new NhanVienDAO(NhanVien.class);
+        nhanVienDAO = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
 
         setLayout(new BorderLayout());
         initUI();
@@ -74,11 +80,11 @@ public class NhanVienGUI extends JPanel implements ActionListener {
         capNhatButton = new JButton("Cập nhật");
         xoaButton = new JButton("Xóa");
 
-        container1.setLayout(new MigLayout("", "[]push[][][]", ""));
+        container1.setLayout(new MigLayout("", "[]push[][]", ""));
         container1.add(timKiemTextField, "w 200!");
         container1.add(themMoiButton);
         container1.add(capNhatButton);
-        container1.add(xoaButton);
+//        container1.add(xoaButton);
 
         // Reduce the scaling factor of each icon
         themMoiButton.setIcon(new FlatSVGIcon("images/svg/add.svg", 0.03f));
@@ -92,7 +98,7 @@ public class NhanVienGUI extends JPanel implements ActionListener {
         add(container0, BorderLayout.CENTER);
     }
 
-    private void setupTable() {
+    private void setupTable() throws RemoteException {
         List<NhanVien> nhanVienList = nhanVienDAO.getAll();
         nhanVienTableModel = new NhanVienTableModel(nhanVienList); // Initialize with data
         nhanVienTable = new JTable(nhanVienTableModel);
@@ -145,17 +151,32 @@ public class NhanVienGUI extends JPanel implements ActionListener {
         timKiemTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                xuLyTimKiem();
+                try {
+                    xuLyTimKiem();
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                xuLyTimKiem();
+                try {
+                    xuLyTimKiem();
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                xuLyTimKiem();
+                try {
+                    xuLyTimKiem();
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -206,7 +227,12 @@ public class NhanVienGUI extends JPanel implements ActionListener {
             themNhanVienDialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosed(java.awt.event.WindowEvent windowEvent) {
-                    refreshNhanVienTable();
+                    try {
+                        refreshNhanVienTable();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
                 }
             });
         });
@@ -220,7 +246,13 @@ public class NhanVienGUI extends JPanel implements ActionListener {
             } else {
                 String maNhanVien = (String) nhanVienTable.getValueAt(rowIndex, 0); // Lấy mã nhân viên
                 maNhanVien = maNhanVien.trim(); // Xóa khoảng trắng ở đầu và cuối chuỗi
-                NhanVien nhanVien = nhanVienDAO.findById(maNhanVien); // Lấy thông tin từ cơ sở dữ liệu
+                NhanVien nhanVien = null; // Lấy thông tin từ cơ sở dữ liệu
+                try {
+                    nhanVien = nhanVienDAO.findById(maNhanVien);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
                 nhanVien.setMaNhanVien(maNhanVien); // Gán mã nhân viên cho đối tượng nhân viên
                 // Mở cửa sổ cập nhật nhân viên
                 capNhatNhanVienDialog = new CapNhatNhanVien(nhanVien);
@@ -229,14 +261,19 @@ public class NhanVienGUI extends JPanel implements ActionListener {
                     @Override
                     public void windowClosed(java.awt.event.WindowEvent windowEvent) {
                         // Lấy lại danh sách nhân viên sau khi thêm nhân viên
-                        refreshNhanVienTable();
+                        try {
+                            refreshNhanVienTable();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             }
         });
     }
 
-    private void refreshNhanVienTable() {
+    private void refreshNhanVienTable() throws RemoteException {
         List<NhanVien> nhanVienList = nhanVienDAO.getAll(); // Lấy lại danh sách nhân viên từ cơ
                                                                     // sở
                                                                     // dữ liệu
@@ -266,7 +303,13 @@ public class NhanVienGUI extends JPanel implements ActionListener {
                 int choice = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa nhân viên này?", "Cảnh báo",
                         JOptionPane.YES_NO_OPTION);
                 if (choice == JOptionPane.YES_OPTION) {
-                    boolean success = nhanVienDAO.delete(maNhanVien);
+                    boolean success = false;
+                    try {
+                        success = nhanVienDAO.delete(maNhanVien);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
                     if (success) {
                         TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO(TaiKhoan.class);
                         boolean isDeleteTaiKhoan = taiKhoanDAO.delete(soDienThoai);
@@ -278,7 +321,12 @@ public class NhanVienGUI extends JPanel implements ActionListener {
                                     JOptionPane.ERROR_MESSAGE);
                         }
 
-                        refreshNhanVienTable();
+                        try {
+                            refreshNhanVienTable();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
                     } else {
                         JOptionPane.showMessageDialog(this, "Xóa thất bại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
@@ -287,7 +335,7 @@ public class NhanVienGUI extends JPanel implements ActionListener {
         });
     }
 
-    private void xuLyTimKiem() {
+    private void xuLyTimKiem() throws RemoteException {
         String keyword = timKiemTextField.getText();
         List<NhanVien> nhanVienList = nhanVienDAO.searchNhanVien(keyword);
         nhanVienTableModel.setNhanVienList(nhanVienList); // Update the table model
