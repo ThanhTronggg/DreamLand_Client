@@ -27,6 +27,7 @@ import entity.Phong;
 import dao.LichChieuDAO;
 import dao.PhimDAO;
 import dao.PhongDAO;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.*;
 
 public class ThemLichChieuDialog extends JDialog implements ActionListener {
@@ -57,11 +58,11 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
 
     public ThemLichChieuDialog(JFrame parent) throws MalformedURLException, NotBoundException, RemoteException {
         super(parent, "Thêm Lịch Chiếu", true);
-        this.lichChieuDAO = (LichChieuService) Naming.lookup("rmi://172.20.10.14:9090/lichChieuService");
+        this.lichChieuDAO = (LichChieuService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/lichChieuService");
         this.dataChanged = false;
-        daoPhong = (PhongService) Naming.lookup("rmi://172.20.10.14:9090/phongService");
-        daoPhim = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
-        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://172.20.10.14:9090/idGeneratorService");
+        daoPhong = (PhongService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/phongService");
+        daoPhim = (PhimService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/phimService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
 
         setSize(600, 350);
         setLocationRelativeTo(parent);

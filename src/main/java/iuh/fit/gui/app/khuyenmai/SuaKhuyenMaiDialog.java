@@ -36,6 +36,7 @@ import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
 
 import entity.KhuyenMai;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.KhuyenMaiService;
 import service.VeService;
 
@@ -207,7 +208,7 @@ public class SuaKhuyenMaiDialog extends JDialog implements ActionListener {
         btnSua.addActionListener(this);
         btnThoat.addActionListener(this);
         
-        kmDao = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
+        kmDao = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
 
         loadKhuyenMaiData();
     }

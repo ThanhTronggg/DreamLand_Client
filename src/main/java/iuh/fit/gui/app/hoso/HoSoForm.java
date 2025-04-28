@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
 
 import entity.NhanVien;
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import service.NhanVienService;
 import service.TaiKhoanService;
@@ -158,7 +159,7 @@ public class HoSoForm extends JPanel {
 		nhanVien.setNgaySinh(java.time.LocalDate.parse(birthDateStr));
 		nhanVien.setNgayBatDauLam(java.time.LocalDate.parse(startDateStr));
 
-		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
+		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/nhanVienService");
 		if (dao.update(nhanVien)) {
 			javax.swing.JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
 		} else {

@@ -15,6 +15,7 @@ import javax.swing.JPasswordField;
 
 import entity.NhanVien;
 import entity.TaiKhoan;
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import service.KhachHangService;
 import service.TaiKhoanService;
@@ -36,7 +37,7 @@ public class DoiMatKhau extends JPanel {
 
 	public DoiMatKhau(NhanVien nhanVien) throws MalformedURLException, NotBoundException, RemoteException {
 		this.nhanVien = nhanVien; // Khởi tạo nhanVien
-		taiKhoanDAO = (TaiKhoanService) Naming.lookup("rmi://172.20.10.14:9090/taiKhoanService");
+		taiKhoanDAO = (TaiKhoanService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/taiKhoanService");
 		initComponents(nhanVien);
 	}
 

@@ -7,6 +7,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.toedter.calendar.JDateChooser;
 import dao.PhimDAO;
 import entity.Phim;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.NhanVienService;
 import service.PhimService;
 
@@ -35,7 +36,7 @@ public class CapNhatPhimDialog extends JDialog implements ActionListener {
 
     public CapNhatPhimDialog(Phim phim) throws MalformedURLException, NotBoundException, RemoteException {
         
-        this.phimDao = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
+        this.phimDao = (PhimService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/phimService");
         setTitle("Cập Nhật Phim");
         setSize(980, 760);
         setResizable(false);

@@ -47,6 +47,7 @@ import entity.LichChieu;
 import entity.NhanVien;
 import entity.SanPham;
 import entity.Ve;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.SanPhamService;
 import service.VeService;
 
@@ -74,7 +75,7 @@ public class ChonSanPhamDialog extends JDialog implements ActionListener {
 	public ChonSanPhamDialog(ArrayList<Ghe> danhSachGheDaChon, LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
 
         danhSachChiTietDatHang = new ArrayList<ChiTietHoaDon>();
-        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/sanPhamService");
         
         pnlChinh = new JPanel(new BorderLayout());
         

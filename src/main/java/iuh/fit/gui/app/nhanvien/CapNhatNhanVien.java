@@ -24,6 +24,7 @@ import com.toedter.calendar.JDateChooser;
 
 import dao.NhanVienDAO;
 import entity.NhanVien;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.NhanVienService;
 
 public class CapNhatNhanVien extends JFrame {
@@ -195,7 +196,7 @@ public class CapNhatNhanVien extends JFrame {
 		nhanVien.setNgaySinh(LocalDate.parse(birthDateStr));
 		nhanVien.setNgayBatDauLam(LocalDate.parse(startDateStr));
 
-		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
+		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/nhanVienService");
 		if (dao.update(nhanVien)) {
 			JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
 			dispose(); // Close the dialog

@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 
 import javax.swing.*;
 import entity.KhachHang;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.KhachHangService;
 
 public class SuaThongTinKhachHangDialog extends JDialog implements ActionListener {
@@ -25,7 +26,7 @@ public class SuaThongTinKhachHangDialog extends JDialog implements ActionListene
 
     public SuaThongTinKhachHangDialog(KhachHang khachHang) throws MalformedURLException, NotBoundException, RemoteException {
         this.khachHang = khachHang;
-        khachHangDao = (KhachHangService) Naming.lookup("rmi://172.20.10.14:9090/khachHangService");
+        khachHangDao = (KhachHangService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khachHangService");
         // Frame settings
         setSize(700, 500);
         setTitle("Sửa thông tin khách hàng");

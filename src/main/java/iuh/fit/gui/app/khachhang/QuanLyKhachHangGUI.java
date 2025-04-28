@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import entity.KhachHang;
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import service.KhachHangService;
 import service.SanPhamService;
@@ -28,7 +29,7 @@ public class QuanLyKhachHangGUI extends JPanel {
     private Timer searchTimer;
 
     public QuanLyKhachHangGUI() throws MalformedURLException, NotBoundException, RemoteException {
-        khachHangDAO = (KhachHangService) Naming.lookup("rmi://172.20.10.14:9090/khachHangService");
+        khachHangDAO = (KhachHangService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khachHangService");
         setLayout(new BorderLayout());
         initComponents();
        // loadInitialData();

@@ -1,5 +1,6 @@
 package iuh.fit.gui.other;
 
+import iuh.fit.gui.app.EnvironmentVariable;
 import org.mindrot.jbcrypt.BCrypt;
 
 import entity.NhanVien;
@@ -17,7 +18,7 @@ public class CtrlLoginForm {
 	private TaiKhoanService tkDAO;
 
 	public CtrlLoginForm() throws MalformedURLException, NotBoundException, RemoteException {
-		tkDAO = (TaiKhoanService) Naming.lookup("rmi://172.20.10.14:9090/taiKhoanService");
+		tkDAO = (TaiKhoanService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/taiKhoanService");
 	}
 
 	public boolean checkCredentials(String username, String password) throws RemoteException {

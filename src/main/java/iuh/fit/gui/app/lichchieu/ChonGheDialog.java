@@ -52,6 +52,7 @@ import entity.Ghe;
 import entity.LichChieu;
 import entity.NhanVien;
 import entity.Ve;
+import iuh.fit.gui.app.EnvironmentVariable;
 import iuh.fit.gui.app.Main;
 import service.GheService;
 import service.LichChieuService;
@@ -105,8 +106,8 @@ public class ChonGheDialog extends JDialog {
 		
         this.setSize(1700, 1000);
         
-        veDao = (VeService) Naming.lookup("rmi://172.20.10.14:9090/veService");
-        gheDAO = (GheService) Naming.lookup("rmi://172.20.10.14:9090/gheService");
+        veDao = (VeService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/veService");
+        gheDAO = (GheService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/gheService");
         pnlKhungChinh = new JPanel();
         pnlKhungChinh.setLayout(new BorderLayout());
         GridBagConstraints gbc = new GridBagConstraints();

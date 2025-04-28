@@ -42,6 +42,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import entity.DoanhThu;
+import iuh.fit.gui.app.EnvironmentVariable;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
@@ -105,7 +106,7 @@ public class ThongKeDoanhThu extends JPanel implements ActionListener {
 
 		setLayout(new BorderLayout());
 
-		doanhThuDAO = (DoanhThuService) Naming.lookup("rmi://172.20.10.14:9090/doanhThuService");
+		doanhThuDAO = (DoanhThuService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/doanhThuService");
 
 		JPanel pnlTitle = new JPanel();
         pnlTitle.setLayout(new MigLayout("", "[]push[][]", ""));

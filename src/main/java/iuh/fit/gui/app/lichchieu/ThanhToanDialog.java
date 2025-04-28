@@ -50,6 +50,7 @@ import dao.KhuyenMaiDAO;
 import dao.SanPhamDAO;
 import dao.VeDAO;
 import entity.*;
+import iuh.fit.gui.app.EnvironmentVariable;
 import iuh.fit.gui.other.TaoHoaDon;
 import iuh.fit.gui.other.TaoVe;
 import service.*;
@@ -93,12 +94,12 @@ public class ThanhToanDialog extends JDialog {
 
     public ThanhToanDialog(ArrayList<Ghe> danhSachGheDaChon, ArrayList<ChiTietHoaDon> danhSachChiTietSanPham, LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
 
-        khachHangDAO = (KhachHangService) Naming.lookup("rmi://172.20.10.14:9090/khachHangService");
-        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
-        chiTietDonHangDAO = (ChiTietHoaDonService) Naming.lookup("rmi://172.20.10.14:9090/chiTietHoaDonService");
-        veDao = (VeService) Naming.lookup("rmi://172.20.10.14:9090/veService");
-        hoaDonDAO = (HoaDonService) Naming.lookup("rmi://172.20.10.14:9090/hoaDonService");
-        khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
+        khachHangDAO = (KhachHangService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khachHangService");
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/sanPhamService");
+        chiTietDonHangDAO = (ChiTietHoaDonService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/chiTietHoaDonService");
+        veDao = (VeService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/veService");
+        hoaDonDAO = (HoaDonService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/hoaDonService");
+        khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
         IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://localhost:9090/idGeneratorService");
         DecimalFormat df = new DecimalFormat("#,##0.00");
         JPanel pnlChinh = new JPanel(new BorderLayout());

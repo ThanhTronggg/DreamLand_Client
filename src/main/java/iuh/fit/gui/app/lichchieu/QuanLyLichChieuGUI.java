@@ -27,6 +27,7 @@ import com.raven.datechooser.EventDateChooser;
 import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
 
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import dao.PhimDAO;
 import entity.LichChieu;
@@ -67,7 +68,7 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
     	setLayout(new BorderLayout());
 		
     	pnlLichChieu = new JPanel();
-		lichChieuDAO = (LichChieuService) Naming.lookup("rmi://172.20.10.14:9090/lichChieuService");
+		lichChieuDAO = (LichChieuService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/lichChieuService");
     	this.nhanVienHienTai = nv;
 //    	System.out.println("QLLCGUI " + nhanVienHienTai);
     	

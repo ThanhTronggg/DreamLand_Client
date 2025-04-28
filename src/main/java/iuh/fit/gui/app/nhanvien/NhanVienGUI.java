@@ -34,6 +34,7 @@ import dao.NhanVienDAO;
 import dao.TaiKhoanDAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import service.NhanVienService;
 import service.PhongService;
@@ -58,7 +59,7 @@ public class NhanVienGUI extends JPanel implements ActionListener {
 
     public NhanVienGUI(NhanVien nhanVienHienTai) throws MalformedURLException, NotBoundException, RemoteException {
         this.nhanVienHienTai = nhanVienHienTai;
-        nhanVienDAO = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
+        nhanVienDAO = (NhanVienService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/nhanVienService");
 
         setLayout(new BorderLayout());
         initUI();

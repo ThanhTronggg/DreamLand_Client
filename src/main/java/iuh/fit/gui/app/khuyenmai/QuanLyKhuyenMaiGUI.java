@@ -39,6 +39,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import entity.KhuyenMai;
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import service.KhuyenMaiService;
 
@@ -294,7 +295,7 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 	
 	public void docData(String options) throws MalformedURLException, NotBoundException, RemoteException {
 		String textTimKiem = txtTim.getText();
-		km_dao = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
+		km_dao = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
 		List<KhuyenMai> list = null;
 		if (options.equals("5 khuyến mãi gần nhất")) {
 			list = km_dao.getNamKhuyenMaiSapHetHan();

@@ -41,6 +41,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import iuh.fit.gui.app.EnvironmentVariable;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
@@ -107,7 +108,7 @@ public class ThongKePhim extends JPanel implements ActionListener {
 
 		setLayout(new BorderLayout());
 
-		phimDAO = (PhimThongKeService) Naming.lookup("rmi://172.20.10.14:9090/phimThongKeService");
+		phimDAO = (PhimThongKeService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/phimThongKeService");
 
 		JPanel pnlTitle = new JPanel();
         pnlTitle.setLayout(new MigLayout("", "[]push[][][]", ""));

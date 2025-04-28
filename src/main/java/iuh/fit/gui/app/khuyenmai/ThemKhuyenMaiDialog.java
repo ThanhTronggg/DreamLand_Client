@@ -39,6 +39,7 @@ import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
 
 import entity.KhuyenMai;
+import iuh.fit.gui.app.EnvironmentVariable;
 import mdlaf.MaterialLookAndFeel;
 import mdlaf.themes.MaterialLiteTheme;
 import service.KhuyenMaiService;
@@ -172,7 +173,7 @@ public class ThemKhuyenMaiDialog extends JDialog implements ActionListener {
 		pnlRow6.add(btnThoat);
 		pnlCen.add(pnlRow6);
 		
-		kmDao = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
+		kmDao = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
 		FlatSVGIcon icon = new FlatSVGIcon("images/svg/calendar.svg", 18, 18);
 		nutChonNgayBD.setIcon(icon);
 		nutChonNgayBD.addActionListener(e -> {

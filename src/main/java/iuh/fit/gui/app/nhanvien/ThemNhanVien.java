@@ -27,6 +27,7 @@ import dao.NhanVienDAO;
 import dao.TaiKhoanDAO;
 import entity.NhanVien;
 import entity.TaiKhoan;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.IdGeneratorService;
 import service.LichChieuService;
 import service.NhanVienService;
@@ -192,9 +193,9 @@ public class ThemNhanVien extends JFrame {
         LocalDate ngaySinh = LocalDate.parse(birthDateStr);
         LocalDate ngayBatDauLam = LocalDate.parse(startDateStr);
 
-        TaiKhoanService tkDao = (TaiKhoanService) Naming.lookup("rmi://172.20.10.14:9090/taiKhoanService");
-        NhanVienService nvDao = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
-        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://172.20.10.14:9090/idGeneratorService");
+        TaiKhoanService tkDao = (TaiKhoanService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/taiKhoanService");
+        NhanVienService nvDao = (NhanVienService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/nhanVienService");
+        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
 
 
         // Tạo NhanVien với mã duy nhất

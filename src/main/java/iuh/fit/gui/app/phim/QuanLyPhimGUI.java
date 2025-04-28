@@ -21,6 +21,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import entity.Phim;
+import iuh.fit.gui.app.EnvironmentVariable;
 import net.miginfocom.swing.MigLayout;
 import service.PhimService;
 
@@ -38,7 +39,7 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
     private PhimService phim_dao;
 
     public QuanLyPhimGUI() throws MalformedURLException, NotBoundException, RemoteException {
-        phim_dao = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
+        phim_dao = (PhimService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/phimService");
        
 
         setLayout(new BorderLayout());

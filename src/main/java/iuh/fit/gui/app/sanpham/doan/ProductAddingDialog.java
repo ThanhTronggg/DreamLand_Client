@@ -21,6 +21,8 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+
+import iuh.fit.gui.app.EnvironmentVariable;
 import raven.crazypanel.CrazyPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -62,7 +64,7 @@ public class ProductAddingDialog extends JDialog {
 //	private FormDrinkManagement formDrinkManagement;
 
 	public ProductAddingDialog(String type) throws MalformedURLException, NotBoundException, RemoteException {
-		productDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
+		productDAO = (SanPhamService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/sanPhamService");
 //		setLayout(new BorderLayout());
 		initComponents(type);
 	}

@@ -8,6 +8,7 @@ import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import entity.SanPham;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.IdGeneratorService;
 import service.SanPhamService;
 
@@ -37,8 +38,8 @@ public class QuanLyDoAnGUI extends JPanel {
         setLayout(new BorderLayout(10, 10));                                                                                                     
         setBorder(new EmptyBorder(20, 20, 20, 20));                                                                                              
         setBackground(Color.WHITE);   
-        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
-        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://172.20.10.14:9090/idGeneratorService");
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/sanPhamService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
 
         danhSachSanPham = null;                                                                                                     
                                                                                                                                                  

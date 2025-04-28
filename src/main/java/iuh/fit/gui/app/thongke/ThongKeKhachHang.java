@@ -32,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import iuh.fit.gui.app.EnvironmentVariable;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
@@ -90,7 +91,7 @@ public class ThongKeKhachHang extends JPanel implements ActionListener {
     public ThongKeKhachHang() throws MalformedURLException, NotBoundException, RemoteException {
     	setLayout(new BorderLayout());
 
-        kh_dao = (KhachHangThongKeService) Naming.lookup("rmi://172.20.10.14:9090/khachHangThongKeService");
+        kh_dao = (KhachHangThongKeService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khachHangThongKeService");
 
         cboLoai = new JComboBox<String>();
         cboLoai.addItem("Theo từng tháng");

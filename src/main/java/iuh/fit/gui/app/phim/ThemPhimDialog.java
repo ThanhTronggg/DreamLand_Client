@@ -5,6 +5,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import com.toedter.calendar.JDateChooser; 
 import entity.Phim;
+import iuh.fit.gui.app.EnvironmentVariable;
 import service.PhimService;
 
 import java.awt.*;
@@ -32,7 +33,7 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
     private Phim phim;
 
     public ThemPhimDialog() throws MalformedURLException, NotBoundException, RemoteException {
-        phimDao = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
+        phimDao = (PhimService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/phimService");
 
         setTitle("Thêm Phim");
         setSize(800, 500);
