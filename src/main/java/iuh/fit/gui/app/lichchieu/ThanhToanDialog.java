@@ -97,6 +97,8 @@ public class ThanhToanDialog extends JDialog {
         if (kiemTraGheDaCoVe(danhSachGheDaChon, lichChieu)) {
             JOptionPane.showMessageDialog(this, "Một hoặc nhiều ghế đã có người đặt. Vui lòng chọn ghế khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             this.dispose();
+            chonSanPhamDialog.dispose();
+            chonSanPhamDialog.disposeChonGheDialog();
             return;
         }
 
@@ -543,6 +545,8 @@ public class ThanhToanDialog extends JDialog {
                     } catch (RemoteException ex) {
                         JOptionPane.showMessageDialog(this, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                         this.dispose();
+                        chonSanPhamDialog.dispose();
+                        chonSanPhamDialog.disposeChonGheDialog();
                         return;
                     }
 
