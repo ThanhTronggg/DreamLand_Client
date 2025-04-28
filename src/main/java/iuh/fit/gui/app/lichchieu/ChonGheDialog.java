@@ -105,8 +105,8 @@ public class ChonGheDialog extends JDialog {
 		
         this.setSize(1700, 1000);
         
-        veDao = (VeService) Naming.lookup("rmi://XXXXXX:9090/veService");
-        gheDAO = (GheService) Naming.lookup("rmi://XXXXXX:9090/gheService");
+        veDao = (VeService) Naming.lookup("rmi://172.20.10.14:9090/veService");
+        gheDAO = (GheService) Naming.lookup("rmi://172.20.10.14:9090/gheService");
         pnlKhungChinh = new JPanel();
         pnlKhungChinh.setLayout(new BorderLayout());
         GridBagConstraints gbc = new GridBagConstraints();

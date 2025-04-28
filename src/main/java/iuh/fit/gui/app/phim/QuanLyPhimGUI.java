@@ -38,7 +38,7 @@ public class QuanLyPhimGUI extends JPanel implements ActionListener{
     private PhimService phim_dao;
 
     public QuanLyPhimGUI() throws MalformedURLException, NotBoundException, RemoteException {
-        phim_dao = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
+        phim_dao = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
        
 
         setLayout(new BorderLayout());

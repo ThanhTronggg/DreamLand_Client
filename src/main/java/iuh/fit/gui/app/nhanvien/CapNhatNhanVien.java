@@ -195,7 +195,7 @@ public class CapNhatNhanVien extends JFrame {
 		nhanVien.setNgaySinh(LocalDate.parse(birthDateStr));
 		nhanVien.setNgayBatDauLam(LocalDate.parse(startDateStr));
 
-		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
+		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
 		if (dao.update(nhanVien)) {
 			JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
 			dispose(); // Close the dialog

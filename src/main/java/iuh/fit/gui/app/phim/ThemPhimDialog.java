@@ -32,7 +32,7 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
     private Phim phim;
 
     public ThemPhimDialog() throws MalformedURLException, NotBoundException, RemoteException {
-        phimDao = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
+        phimDao = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
 
         setTitle("Thêm Phim");
         setSize(800, 500);

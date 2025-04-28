@@ -192,9 +192,9 @@ public class ThemNhanVien extends JFrame {
         LocalDate ngaySinh = LocalDate.parse(birthDateStr);
         LocalDate ngayBatDauLam = LocalDate.parse(startDateStr);
 
-        TaiKhoanService tkDao = (TaiKhoanService) Naming.lookup("rmi://XXXXXX:9090/taiKhoanService");
-        NhanVienService nvDao = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
-        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://XXXXXX:9090/idGeneratorService");
+        TaiKhoanService tkDao = (TaiKhoanService) Naming.lookup("rmi://172.20.10.14:9090/taiKhoanService");
+        NhanVienService nvDao = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
+        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://172.20.10.14:9090/idGeneratorService");
 
 
         // Tạo NhanVien với mã duy nhất

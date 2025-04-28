@@ -28,7 +28,7 @@ public class QuanLyKhachHangGUI extends JPanel {
     private Timer searchTimer;
 
     public QuanLyKhachHangGUI() throws MalformedURLException, NotBoundException, RemoteException {
-        khachHangDAO = (KhachHangService) Naming.lookup("rmi://XXXXXX:9090/khachHangService");
+        khachHangDAO = (KhachHangService) Naming.lookup("rmi://172.20.10.14:9090/khachHangService");
         setLayout(new BorderLayout());
         initComponents();
        // loadInitialData();

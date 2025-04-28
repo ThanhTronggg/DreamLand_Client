@@ -25,7 +25,7 @@ public class SuaThongTinKhachHangDialog extends JDialog implements ActionListene
 
     public SuaThongTinKhachHangDialog(KhachHang khachHang) throws MalformedURLException, NotBoundException, RemoteException {
         this.khachHang = khachHang;
-        khachHangDao = (KhachHangService) Naming.lookup("rmi://XXXXXX:9090/khachHangService");
+        khachHangDao = (KhachHangService) Naming.lookup("rmi://172.20.10.14:9090/khachHangService");
         // Frame settings
         setSize(700, 500);
         setTitle("Sửa thông tin khách hàng");

@@ -11,6 +11,10 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.swing.Box;
@@ -34,9 +38,9 @@ import javax.swing.table.TableCellRenderer;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-import dao.KhuyenMaiDAO;
 import entity.KhuyenMai;
 import net.miginfocom.swing.MigLayout;
+import service.KhuyenMaiService;
 
 
 /**
@@ -56,10 +60,10 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 	private JTable table;
 	private JComboBox<String> cboLoaiHienThi;
 	private JButton btnXoa;
-	private KhuyenMaiDAO km_dao;
+	private KhuyenMaiService km_dao;
 
 
-	public QuanLyKhuyenMaiGUI() {
+	public QuanLyKhuyenMaiGUI() throws MalformedURLException, NotBoundException, RemoteException {
 		
 		setLayout(new BorderLayout());
 		
@@ -133,18 +137,42 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 			
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				hienThi();
-			}
+                try {
+                    hienThi();
+                } catch (MalformedURLException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 			
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				hienThi();
-			}
+                try {
+                    hienThi();
+                } catch (MalformedURLException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 			
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				hienThi();
-			}
+                try {
+                    hienThi();
+                } catch (MalformedURLException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 		});
 	}
 
@@ -154,21 +182,49 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 		Object o = e.getSource();
 		
 		if(o.equals(cboLoaiHienThi)) {
-			hienThi();
-		}
+            try {
+                hienThi();
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 		if(o.equals(btnThem)) {
-			them();
-		}
+            try {
+                them();
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 		if(o.equals(btnXoa)) {
-			xoa();
-		}
+            try {
+                xoa();
+            } catch (RemoteException | MalformedURLException | NotBoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 		if(o.equals(btnSua)) {
-			sua();
-		}
+            try {
+                sua();
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 		
 	}
 
-	private void sua() {
+	private void sua() throws MalformedURLException, NotBoundException, RemoteException {
 		int index = table.getSelectedRow();
 		if (index == -1) {
 			UIManager.put("OptionPane.yesButtonText", "Có");
@@ -192,7 +248,7 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 	}
 
 
-	private void xoa() {
+	private void xoa() throws RemoteException, MalformedURLException, NotBoundException {
 		int index = table.getSelectedRow();
 		if (index == -1) {
 			UIManager.put("OptionPane.yesButtonText", "Có");
@@ -223,7 +279,7 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 	}
 
 
-	private void them() {
+	private void them() throws MalformedURLException, NotBoundException, RemoteException {
 		ThemKhuyenMaiDialog themKM = new ThemKhuyenMaiDialog();
 		themKM.setModal(true);
 		themKM.setVisible(true);
@@ -232,13 +288,13 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 	
 
 
-	private void hienThi() {
+	private void hienThi() throws MalformedURLException, NotBoundException, RemoteException {
 		docData(cboLoaiHienThi.getSelectedItem().toString());
 	}
 	
-	public void docData(String options) {
+	public void docData(String options) throws MalformedURLException, NotBoundException, RemoteException {
 		String textTimKiem = txtTim.getText();
-		km_dao = new KhuyenMaiDAO(KhuyenMai.class);
+		km_dao = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
 		List<KhuyenMai> list = null;
 		if (options.equals("5 khuyến mãi gần nhất")) {
 			list = km_dao.getNamKhuyenMaiSapHetHan();

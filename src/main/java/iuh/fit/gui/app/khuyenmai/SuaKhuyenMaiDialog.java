@@ -12,6 +12,10 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -31,8 +35,9 @@ import com.raven.datechooser.EventDateChooser;
 import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
 
-import dao.KhuyenMaiDAO;
 import entity.KhuyenMai;
+import service.KhuyenMaiService;
+import service.VeService;
 
 /**
  * @description:
@@ -50,7 +55,7 @@ public class SuaKhuyenMaiDialog extends JDialog implements ActionListener {
 	private JTextField txtTongTien;
 	private JTextField txtPhanTram;
 	private JButton btnThoat;
-	private KhuyenMaiDAO kmDao;
+	private KhuyenMaiService kmDao;
 	private QuanLyKhuyenMaiGUI quanLyKhuyenMaiGUI;
 	private JButton btnSua;
 	private KhuyenMai khuyenMai;
@@ -59,7 +64,7 @@ public class SuaKhuyenMaiDialog extends JDialog implements ActionListener {
 	private DateChooser chonNgayKT;
 	private JButton nutChonNgayKT;
 
-    public SuaKhuyenMaiDialog(KhuyenMai khuyenMai) {
+    public SuaKhuyenMaiDialog(KhuyenMai khuyenMai) throws MalformedURLException, NotBoundException, RemoteException {
         this.khuyenMai = khuyenMai;
         
         //frame
@@ -202,7 +207,7 @@ public class SuaKhuyenMaiDialog extends JDialog implements ActionListener {
         btnSua.addActionListener(this);
         btnThoat.addActionListener(this);
         
-        kmDao = new KhuyenMaiDAO(KhuyenMai.class);
+        kmDao = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
 
         loadKhuyenMaiData();
     }
@@ -221,9 +226,13 @@ public class SuaKhuyenMaiDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o.equals(btnSua) || o.equals(txtTenKM)|| o.equals(txtNgayBD)|| o.equals(txtNgayKT)|| o.equals(txtTongTien) || o.equals(txtPhanTram)) {
-			capNhatKhuyenMai();
-			
-		}
+            try {
+                capNhatKhuyenMai();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+
+        }
 		if(o.equals(btnThoat)) {
 			UIManager.put("OptionPane.yesButtonText", "Có");
 	        UIManager.put("OptionPane.noButtonText", "Không");
@@ -238,7 +247,7 @@ public class SuaKhuyenMaiDialog extends JDialog implements ActionListener {
 		}
 		
 	}
-	private void capNhatKhuyenMai() {
+	private void capNhatKhuyenMai() throws RemoteException {
 	    if (kiemTraDieuKien()) {
 	    	System.out.println(khuyenMai);
 	        if (kmDao.update(khuyenMai)) {

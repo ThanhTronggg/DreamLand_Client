@@ -37,8 +37,8 @@ public class QuanLyNuocUongGUI extends JPanel {
         setBorder(new EmptyBorder(20, 20, 20, 20));
         setBackground(Color.WHITE);
 
-        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
-        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://XXXXXX:9090/idGeneratorService");
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://172.20.10.14:9090/idGeneratorService");
         
         danhSachSanPham = null; 
 

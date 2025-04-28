@@ -158,7 +158,7 @@ public class HoSoForm extends JPanel {
 		nhanVien.setNgaySinh(java.time.LocalDate.parse(birthDateStr));
 		nhanVien.setNgayBatDauLam(java.time.LocalDate.parse(startDateStr));
 
-		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
+		NhanVienService dao = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
 		if (dao.update(nhanVien)) {
 			javax.swing.JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
 		} else {

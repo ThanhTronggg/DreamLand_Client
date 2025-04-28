@@ -67,7 +67,7 @@ public class QuanLyLichChieuGUI extends JPanel implements ActionListener {
     	setLayout(new BorderLayout());
 		
     	pnlLichChieu = new JPanel();
-		lichChieuDAO = (LichChieuService) Naming.lookup("rmi://XXXXXX:9090/lichChieuService");
+		lichChieuDAO = (LichChieuService) Naming.lookup("rmi://172.20.10.14:9090/lichChieuService");
     	this.nhanVienHienTai = nv;
 //    	System.out.println("QLLCGUI " + nhanVienHienTai);
     	

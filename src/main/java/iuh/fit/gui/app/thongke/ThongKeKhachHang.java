@@ -90,7 +90,7 @@ public class ThongKeKhachHang extends JPanel implements ActionListener {
     public ThongKeKhachHang() throws MalformedURLException, NotBoundException, RemoteException {
     	setLayout(new BorderLayout());
 
-        kh_dao = (KhachHangThongKeService) Naming.lookup("rmi://XXXXXX:9090/khachHangThongKeService");
+        kh_dao = (KhachHangThongKeService) Naming.lookup("rmi://172.20.10.14:9090/khachHangThongKeService");
 
         cboLoai = new JComboBox<String>();
         cboLoai.addItem("Theo từng tháng");

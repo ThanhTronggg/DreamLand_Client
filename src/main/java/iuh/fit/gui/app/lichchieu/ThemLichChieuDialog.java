@@ -57,11 +57,11 @@ public class ThemLichChieuDialog extends JDialog implements ActionListener {
 
     public ThemLichChieuDialog(JFrame parent) throws MalformedURLException, NotBoundException, RemoteException {
         super(parent, "Thêm Lịch Chiếu", true);
-        this.lichChieuDAO = (LichChieuService) Naming.lookup("rmi://XXXXXX:9090/lichChieuService");
+        this.lichChieuDAO = (LichChieuService) Naming.lookup("rmi://172.20.10.14:9090/lichChieuService");
         this.dataChanged = false;
-        daoPhong = (PhongService) Naming.lookup("rmi://XXXXXX:9090/phongService");
-        daoPhim = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
-        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://XXXXXX:9090/idGeneratorService");
+        daoPhong = (PhongService) Naming.lookup("rmi://172.20.10.14:9090/phongService");
+        daoPhim = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://172.20.10.14:9090/idGeneratorService");
 
         setSize(600, 350);
         setLocationRelativeTo(parent);

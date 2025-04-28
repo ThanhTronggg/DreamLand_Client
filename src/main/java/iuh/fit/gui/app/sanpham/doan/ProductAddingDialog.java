@@ -62,7 +62,7 @@ public class ProductAddingDialog extends JDialog {
 //	private FormDrinkManagement formDrinkManagement;
 
 	public ProductAddingDialog(String type) throws MalformedURLException, NotBoundException, RemoteException {
-		productDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
+		productDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
 //		setLayout(new BorderLayout());
 		initComponents(type);
 	}

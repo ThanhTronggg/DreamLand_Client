@@ -105,7 +105,7 @@ public class ThongKeDoanhThu extends JPanel implements ActionListener {
 
 		setLayout(new BorderLayout());
 
-		doanhThuDAO = (DoanhThuService) Naming.lookup("rmi://XXXXXX:9090/doanhThuService");
+		doanhThuDAO = (DoanhThuService) Naming.lookup("rmi://172.20.10.14:9090/doanhThuService");
 
 		JPanel pnlTitle = new JPanel();
         pnlTitle.setLayout(new MigLayout("", "[]push[][]", ""));

@@ -17,7 +17,7 @@ public class CtrlLoginForm {
 	private TaiKhoanService tkDAO;
 
 	public CtrlLoginForm() throws MalformedURLException, NotBoundException, RemoteException {
-		tkDAO = (TaiKhoanService) Naming.lookup("rmi://XXXXXX:9090/taiKhoanService");
+		tkDAO = (TaiKhoanService) Naming.lookup("rmi://172.20.10.14:9090/taiKhoanService");
 	}
 
 	public boolean checkCredentials(String username, String password) throws RemoteException {

@@ -93,12 +93,12 @@ public class ThanhToanDialog extends JDialog {
 
     public ThanhToanDialog(ArrayList<Ghe> danhSachGheDaChon, ArrayList<ChiTietHoaDon> danhSachChiTietSanPham, LichChieu lichChieu) throws MalformedURLException, NotBoundException, RemoteException {
 
-        khachHangDAO = (KhachHangService) Naming.lookup("rmi://XXXXXX:9090/khachHangService");
-        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://XXXXXX:9090/sanPhamService");
-        chiTietDonHangDAO = (ChiTietHoaDonService) Naming.lookup("rmi://XXXXXX:9090/chiTietHoaDonService");
-        veDao = (VeService) Naming.lookup("rmi://XXXXXX:9090/veService");
-        hoaDonDAO = (HoaDonService) Naming.lookup("rmi://XXXXXX:9090/hoaDonService");
-        khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://XXXXXX:9090/khuyenMaiService");
+        khachHangDAO = (KhachHangService) Naming.lookup("rmi://172.20.10.14:9090/khachHangService");
+        sanPhamDAO = (SanPhamService) Naming.lookup("rmi://172.20.10.14:9090/sanPhamService");
+        chiTietDonHangDAO = (ChiTietHoaDonService) Naming.lookup("rmi://172.20.10.14:9090/chiTietHoaDonService");
+        veDao = (VeService) Naming.lookup("rmi://172.20.10.14:9090/veService");
+        hoaDonDAO = (HoaDonService) Naming.lookup("rmi://172.20.10.14:9090/hoaDonService");
+        khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://172.20.10.14:9090/khuyenMaiService");
         IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://localhost:9090/idGeneratorService");
         DecimalFormat df = new DecimalFormat("#,##0.00");
         JPanel pnlChinh = new JPanel(new BorderLayout());

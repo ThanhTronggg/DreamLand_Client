@@ -36,7 +36,7 @@ public class DoiMatKhau extends JPanel {
 
 	public DoiMatKhau(NhanVien nhanVien) throws MalformedURLException, NotBoundException, RemoteException {
 		this.nhanVien = nhanVien; // Khởi tạo nhanVien
-		taiKhoanDAO = (TaiKhoanService) Naming.lookup("rmi://XXXXXX:9090/taiKhoanService");
+		taiKhoanDAO = (TaiKhoanService) Naming.lookup("rmi://172.20.10.14:9090/taiKhoanService");
 		initComponents(nhanVien);
 	}
 

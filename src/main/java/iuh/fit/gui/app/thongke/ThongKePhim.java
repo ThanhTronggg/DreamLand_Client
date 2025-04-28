@@ -107,7 +107,7 @@ public class ThongKePhim extends JPanel implements ActionListener {
 
 		setLayout(new BorderLayout());
 
-		phimDAO = (PhimThongKeService) Naming.lookup("rmi://XXXXXX:9090/phimThongKeService");
+		phimDAO = (PhimThongKeService) Naming.lookup("rmi://172.20.10.14:9090/phimThongKeService");
 
 		JPanel pnlTitle = new JPanel();
         pnlTitle.setLayout(new MigLayout("", "[]push[][][]", ""));

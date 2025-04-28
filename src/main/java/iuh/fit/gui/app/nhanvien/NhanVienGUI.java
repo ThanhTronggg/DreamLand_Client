@@ -58,7 +58,7 @@ public class NhanVienGUI extends JPanel implements ActionListener {
 
     public NhanVienGUI(NhanVien nhanVienHienTai) throws MalformedURLException, NotBoundException, RemoteException {
         this.nhanVienHienTai = nhanVienHienTai;
-        nhanVienDAO = (NhanVienService) Naming.lookup("rmi://XXXXXX:9090/nhanVienService");
+        nhanVienDAO = (NhanVienService) Naming.lookup("rmi://172.20.10.14:9090/nhanVienService");
 
         setLayout(new BorderLayout());
         initUI();

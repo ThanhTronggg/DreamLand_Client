@@ -35,7 +35,7 @@ public class CapNhatPhimDialog extends JDialog implements ActionListener {
 
     public CapNhatPhimDialog(Phim phim) throws MalformedURLException, NotBoundException, RemoteException {
         
-        this.phimDao = (PhimService) Naming.lookup("rmi://XXXXXX:9090/phimService");
+        this.phimDao = (PhimService) Naming.lookup("rmi://172.20.10.14:9090/phimService");
         setTitle("Cập Nhật Phim");
         setSize(980, 760);
         setResizable(false);
