@@ -147,6 +147,7 @@ public class ThemPhimDialog extends JDialog implements ActionListener {
                 switch (i) {
                     case 0: {
                         textField = txtThoiLuong;
+                        break;
                     }
                     case 1: {
                         textField = txtNgonNgu;

@@ -273,6 +273,9 @@ public class QuanLyKhuyenMaiGUI extends JPanel implements ActionListener {
 					table.clearSelection();
 					hienThi();
 				}
+				else {
+					JOptionPane.showMessageDialog(this, "Khuyến mãi đã có hóa đơn dùng, không thể xóa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 			UIManager.put("Button.background", Color.white);
 			UIManager.put("Button.foreground", Color.black);

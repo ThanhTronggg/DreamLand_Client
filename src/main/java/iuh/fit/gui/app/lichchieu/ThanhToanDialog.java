@@ -101,7 +101,15 @@ public class ThanhToanDialog extends JDialog {
         hoaDonDAO = (HoaDonService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/hoaDonService");
         khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
         IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
+        veDao = (VeService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/veService");
         DecimalFormat df = new DecimalFormat("#,##0.00");
+
+        if (kiemTraGheDaCoVe(danhSachGheDaChon, lichChieu)) {
+            JOptionPane.showMessageDialog(this, "Một hoặc nhiều ghế đã có người đặt. Vui lòng chọn ghế khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            return;
+        }
+
         JPanel pnlChinh = new JPanel(new BorderLayout());
 
 
@@ -454,6 +462,11 @@ return;
         pnlBtnThanhToan.add(Box.createVerticalStrut(20));
         btnThanhToan.addActionListener(e -> {
             try {
+                if (kiemTraGheDaCoVe(danhSachGheDaChon, lichChieu)) {
+                    JOptionPane.showMessageDialog(this, "Một hoặc nhiều ghế đã có người đặt. Vui lòng chọn ghế khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    this.dispose();
+                    return;
+                }
                 // Kiểm tra dữ liệu đầu vào
                 if (!validateSDT() || !validateTen() || !validateEmail()) {
                     return;
@@ -549,11 +562,7 @@ return;
                     TaoVe.taoVe(ve);
                 }
 
-                ArrayList<Ve> danhSachVe = new ArrayList<>();
-
-                for (Ve ve: danhSachVeMoi) {
-                    danhSachVe.add(ve);
-                }
+                ArrayList<Ve> danhSachVe = new ArrayList<>(danhSachVeMoi);
                 TaoHoaDon.taoHD(danhSachChiTietSanPham, danhSachVe, hd);
 
                 // Đóng dialog
@@ -619,6 +628,21 @@ return;
             txtEmail.setText(khachHang.getEmail());
         }
         return true;
+    }
+
+    private boolean kiemTraGheDaCoVe(List<Ghe> danhSachGheDaChon, LichChieu lichChieu) throws RemoteException {
+        ArrayList<Ve> danhSachVe1 = veDao.getVeTheoLichChieu(lichChieu);
+        Set<String> gheDaDat = new HashSet<>();
+        for (Ve ve : danhSachVe1) {
+            gheDaDat.add(String.valueOf(ve.getGhe().getMaGhe()));
+        }
+
+        for (Ghe ghe : danhSachGheDaChon) {
+            if (gheDaDat.contains(String.valueOf(ghe.getMaGhe()))) {
+                return true; // Ghế đã có vé
+            }
+        }
+        return false; // Tất cả ghế đều chưa có vé
     }
 
 

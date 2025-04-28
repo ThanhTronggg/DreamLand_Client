@@ -42,6 +42,7 @@ import entity.KhuyenMai;
 import iuh.fit.gui.app.EnvironmentVariable;
 import mdlaf.MaterialLookAndFeel;
 import mdlaf.themes.MaterialLiteTheme;
+import service.IdGeneratorService;
 import service.KhuyenMaiService;
 
 /**
@@ -54,6 +55,7 @@ import service.KhuyenMaiService;
 public class ThemKhuyenMaiDialog extends JDialog implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
+	private final IdGeneratorService idGeneratorService;
 	private JTextField txtTenKM;
 	private JTextField txtNgayBD;
 	private JTextField txtNgayKT;
@@ -174,6 +176,7 @@ public class ThemKhuyenMaiDialog extends JDialog implements ActionListener {
 		pnlCen.add(pnlRow6);
 		
 		kmDao = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
+		idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
 		FlatSVGIcon icon = new FlatSVGIcon("images/svg/calendar.svg", 18, 18);
 		nutChonNgayBD.setIcon(icon);
 		nutChonNgayBD.addActionListener(e -> {
@@ -250,7 +253,7 @@ public class ThemKhuyenMaiDialog extends JDialog implements ActionListener {
 		}
 	}
 	
-	private KhuyenMai kiemTraDieuKien() {
+	private KhuyenMai kiemTraDieuKien() throws RemoteException {
 		String ngayBD = txtNgayBD.getText();
 		String ngayKT = txtNgayKT.getText();
 		double phanTram;
@@ -304,6 +307,7 @@ public class ThemKhuyenMaiDialog extends JDialog implements ActionListener {
 		LocalDate ngayKTLocalDate = LocalDate.parse(ngayKT, formatter);
 		
 		KhuyenMai km = new KhuyenMai(ten, ngayBDLocalDate, ngayKTLocalDate, tongTien, phanTram/100);
+		km.setMaKhuyenMai(idGeneratorService.getNextId("KhuyenMai"));
 		return km;
 	}
 

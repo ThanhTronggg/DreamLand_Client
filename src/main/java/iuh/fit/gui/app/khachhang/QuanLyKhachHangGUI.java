@@ -111,7 +111,7 @@ public class QuanLyKhachHangGUI extends JPanel {
         btnXoa = createButton("Xóa", "images/svg/delete.svg", new Color(255, 0, 0));
 
         pnlSouth.add(btnSua, "gapright 10");
-        pnlSouth.add(btnXoa);
+//        pnlSouth.add(btnXoa);
 
         return pnlSouth;
     }

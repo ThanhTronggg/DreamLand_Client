@@ -226,6 +226,7 @@ public class QuanLyDoAnGUI extends JPanel {
                 newProduct.setLoaiSanPham(loaiSP);
                 newProduct.dinhGiaBan();
                 newProduct.setMaSanPham(idGeneratorService.getNextId("SanPham"));
+                newProduct.setAnh(anh);
                 danhSachSanPham.add(newProduct);
                 refreshProductsPanel();
                 if(sanPhamDAO.add(newProduct)) {
