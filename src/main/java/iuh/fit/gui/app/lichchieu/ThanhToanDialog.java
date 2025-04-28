@@ -100,7 +100,7 @@ public class ThanhToanDialog extends JDialog {
         veDao = (VeService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/veService");
         hoaDonDAO = (HoaDonService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/hoaDonService");
         khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
-        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://localhost:9090/idGeneratorService");
+        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
         DecimalFormat df = new DecimalFormat("#,##0.00");
         JPanel pnlChinh = new JPanel(new BorderLayout());
 
