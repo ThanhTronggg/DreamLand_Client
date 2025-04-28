@@ -96,6 +96,8 @@ public class ThanhToanDialog extends JDialog {
         if (kiemTraGheDaCoVe(danhSachGheDaChon, lichChieu)) {
             JOptionPane.showMessageDialog(this, "Một hoặc nhiều ghế đã có người đặt. Vui lòng chọn ghế khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             this.dispose();
+            chonSanPhamDialog.dispose();
+            chonSanPhamDialog.disposeChonGheDialog();
             return;
         }
 
@@ -447,15 +449,14 @@ public class ThanhToanDialog extends JDialog {
         pnlBtnThanhToan.add(btnThanhToan);
         pnlBtnThanhToan.add(Box.createVerticalStrut(20));
         btnThanhToan.addActionListener(e -> {
-            try {
-                // Kiểm tra dữ liệu đầu vào
-                if (!validateSDT() || !validateTen() || !validateEmail()) {
-                    return;
-                }
+            synchronized (ThanhToanDialog.class) { // Đồng bộ hóa toàn bộ quá trình thanh toán
+                try {
+                    // Kiểm tra dữ liệu đầu vào
+                    if (!validateSDT() || !validateTen() || !validateEmail()) {
+                        return;
+                    }
 
-                // Đồng bộ hóa để tránh xung đột
-                synchronized (VeService.class) { // Khóa trên VeService
-                    // Kiểm tra lại ghế trước khi thanh toán
+                    // Kiểm tra ghế đã có vé
                     if (kiemTraGheDaCoVe(danhSachGheDaChon, lichChieu)) {
                         JOptionPane.showMessageDialog(this, "Một hoặc nhiều ghế đã có người đặt. Vui lòng chọn ghế khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         this.dispose();
@@ -527,7 +528,7 @@ public class ThanhToanDialog extends JDialog {
                     hd.setDanhSachVe(danhSachVeMoi);
                     hd.setTongTien(danhSachChiTietSanPham, danhSachGheDaChon, lichChieu);
 
-                    // Lưu HoaDon
+                    // Lưu HoaDon trước
                     hoaDonDAO.add(hd);
 
                     // Lưu ChiTietHoaDon
@@ -537,15 +538,13 @@ public class ThanhToanDialog extends JDialog {
                         chiTietDonHangDAO.add(ct);
                     }
 
-                    // Lưu Ve với kiểm tra ghế
-                    for (Ve ve : danhSachVeMoi) {
-                        try {
-                            veDao.addVeWithCheck(ve);
-                        } catch (RemoteException ex) {
-                            JOptionPane.showMessageDialog(this, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            this.dispose();
-                            return;
-                        }
+                    // Lưu tất cả vé trong một giao dịch
+                    try {
+                        veDao.addMultipleVesWithCheck(danhSachVeMoi, lichChieu);
+                    } catch (RemoteException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        this.dispose();
+                        return;
                     }
 
                     // Thông báo thành công và tạo tài liệu
@@ -561,11 +560,11 @@ public class ThanhToanDialog extends JDialog {
                     this.dispose();
                     chonSanPhamDialog.dispose();
                     chonSanPhamDialog.disposeChonGheDialog();
-                }
 
-            } catch (RemoteException ex) {
-                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                throw new RuntimeException(ex);
+                } catch (RemoteException ex) {
+                    JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    this.dispose();
+                }
             }
         });
         pnlThanhToan.add(pnlBtnThanhToan, BorderLayout.SOUTH);
