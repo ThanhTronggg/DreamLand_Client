@@ -73,6 +73,7 @@ public class ThanhToanDialog extends JDialog {
     private KhuyenMaiService khuyenMaiDAO;
     private VeService veDao;
     private HoaDonService hoaDonDAO;
+    private IdGeneratorService idGeneratorService;
     private JLabel lblLoiTen;
     private JLabel lblLoiSoDienThoai;
     private JLabel lblLoiEmail;
@@ -90,14 +91,12 @@ public class ThanhToanDialog extends JDialog {
         veDao = (VeService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/veService");
         hoaDonDAO = (HoaDonService) Naming.lookup("rmi://"+EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/hoaDonService");
         khuyenMaiDAO = (KhuyenMaiService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/khuyenMaiService");
-        IdGeneratorService idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
+        idGeneratorService = (IdGeneratorService) Naming.lookup("rmi://"+ EnvironmentVariable.IP.getValue()+":"+Integer.parseInt(EnvironmentVariable.PORT_SERVER.getValue())+"/idGeneratorService");
 
         // Kiểm tra ghế đã có vé ngay khi khởi tạo dialog
         if (kiemTraGheDaCoVe(danhSachGheDaChon, lichChieu)) {
             JOptionPane.showMessageDialog(this, "Một hoặc nhiều ghế đã có người đặt. Vui lòng chọn ghế khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             this.dispose();
-            chonSanPhamDialog.dispose();
-            chonSanPhamDialog.disposeChonGheDialog();
             return;
         }
 
